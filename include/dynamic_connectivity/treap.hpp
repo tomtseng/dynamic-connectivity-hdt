@@ -36,6 +36,8 @@ class Node {
   // Joins the tree U containing `lesser` to the tree V containing `greater` and
   // returns the root of resulting tree. The result contains all elements of U
   // in order followed by all elements of V in order.
+  //
+  // `lesser` and `greater` must not live in the same tree.
   static Node* Join(Node* lesser, Node* greater);
 
  private:
