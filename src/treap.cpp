@@ -1,13 +1,14 @@
 #include <dynamic_connectivity/treap.hpp>
 
 #include <random>
+#include <stdexcept>
 
 namespace treap {
 
 namespace {
 
-  constexpr int LEFT = 0;
-  constexpr int RIGHT = 1;
+  constexpr bool LEFT = 0;
+  constexpr bool RIGHT = 1;
 
   std::mt19937 random_generator{0};
   std::uniform_int_distribution<uint32_t> priority_distribution{0, UINT32_MAX};
@@ -15,15 +16,17 @@ namespace {
 }  // namespace
 
 Node::Node()
-  : parent_{nullptr}
-  , child_{nullptr, nullptr}
+  : children_{nullptr, nullptr}
+  , parent_{nullptr}
   , priority_{priority_distribution(random_generator)} {}
 
-void Node::AssignChild(int i, Node* v) {
+Node::~Node() {}
+
+void Node::AssignChild(bool direction, Node* v) {
   if (v != nullptr) {
     v->parent_ = this;
   }
-  child_[i] = v;
+  children_[direction] = v;
 }
 
 Node* Node::GetRoot() const {
@@ -36,9 +39,9 @@ Node* Node::GetRoot() const {
 
 std::pair<Node*, Node*> Node::Split() {
   Node* lesser{nullptr};
-  Node* greater{child_[RIGHT]};
-  if (child_[RIGHT] != nullptr) {
-    child_[RIGHT]->parent_ = nullptr;
+  Node* greater{children_[RIGHT]};
+  if (children_[RIGHT] != nullptr) {
+    children_[RIGHT]->parent_ = nullptr;
     AssignChild(RIGHT, nullptr);
   }
 
@@ -48,7 +51,7 @@ std::pair<Node*, Node*> Node::Split() {
   while (current != nullptr) {
     Node* parent{current->parent_};
     if (parent != nullptr) {
-      current_is_right_child = parent->child_[RIGHT] == current;
+      current_is_right_child = parent->children_[RIGHT] == current;
       parent->AssignChild(current_is_right_child, nullptr);
       current->parent_ = nullptr;
     }
@@ -64,6 +67,7 @@ std::pair<Node*, Node*> Node::Split() {
   return {lesser, greater};
 }
 
+// Joins the tree rooted at `lesser` to the tree rooted at `greater`.
 Node* Node::JoinRoots(Node* lesser, Node* greater) {
   if (lesser == nullptr) {
     return greater;
@@ -72,15 +76,20 @@ Node* Node::JoinRoots(Node* lesser, Node* greater) {
   }
 
   if (lesser->priority_ > greater->priority_) {
-    lesser->AssignChild(RIGHT, JoinRoots(lesser->child_[RIGHT], greater));
+    lesser->AssignChild(RIGHT, JoinRoots(lesser->children_[RIGHT], greater));
     return lesser;
   } else {
-    greater->AssignChild(LEFT, JoinRoots(lesser, greater->child_[LEFT]));
+    greater->AssignChild(LEFT, JoinRoots(lesser, greater->children_[LEFT]));
     return greater;
   }
 }
 
 Node* Node::Join(Node* lesser, Node* greater) {
+  Node* const lesser_root = lesser == nullptr ? nullptr : lesser->GetRoot();
+  Node* const greater_root = greater == nullptr ? nullptr : greater->GetRoot();
+  if (lesser_root == greater_root && lesser_root != nullptr) {
+    throw std::invalid_argument("Input nodes live in the same tree");
+  }
   return JoinRoots(
       lesser == nullptr ? nullptr : lesser->GetRoot(),
       greater == nullptr ? nullptr : greater->GetRoot());
