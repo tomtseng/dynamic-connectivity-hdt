@@ -1,12 +1,12 @@
 include (GoogleTest)
 
-add_executable(test_treap
-  test_treap.cpp
+add_executable(test_sequence
+  test_sequence.cpp
 )
 
-target_link_libraries(test_treap
+target_link_libraries(test_sequence
   gtest_main
-  lib_treap
+  lib_sequence
 )
 
-gtest_discover_tests(test_treap)
+gtest_discover_tests(test_sequence)
