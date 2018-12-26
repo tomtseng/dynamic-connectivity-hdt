@@ -1,0 +1,7 @@
+language: cpp
+jobs:
+  include:
+    - stage: build
+      script: scripts/travis_build.bash
+    - stage: test
+      script: scripts/travis_test.bash

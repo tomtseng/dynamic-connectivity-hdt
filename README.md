@@ -1,7 +1,7 @@
-## Dynamic Connectivity
+## Dynamic Connectivity [![Build Status](https://travis-ci.com/tomtseng/dynamic-connectivity-hdt.svg?token=4YxzvXpUhyrEkNzZRD8y&branch=master)](https://travis-ci.com/tomtseng/dynamic-connectivity-hdt)
 
 This is an implementation of Holm et al.'s data structure for dynamic
-connectivity. 
+connectivity.
 
 Full details of the data structure may be found in their paper titled
 [_Poly-Logarithmic Deterministic Fully-Dynamic Algorithms for Connectivity,
@@ -20,7 +20,7 @@ This code uses CMake version 3.13.2 and g++ version 5.5.0.
 Run the following shell commands:
 
 ```
-mkdir build 
+mkdir build
 cd build
 cmake ..
 make
