@@ -7,3 +7,4 @@ mkdir ${build_dir}
 cd ${build_dir}
 cmake ${base_dir}
 make
+make check
