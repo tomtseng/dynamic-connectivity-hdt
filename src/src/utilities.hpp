@@ -1,3 +1,7 @@
+// Miscellaneous utility functions.
+//
+// Consider splitting groups of functions into separate files if this file
+// becomes bloated.
 #pragma once
 
 #include <utility>
@@ -12,10 +16,10 @@ std::size_t HashInt(std::size_t x);
 //     std::pair<std::size_t, std::size_t>, std::string, IntPairHasher>
 //     int_to_string_map;
 //
-// This hash struct was written because it was found that boost's integer pair
-// hash `boost::hash<pair<., .>>` gives a low range of values and did not
-// perform as well as expected in hash containers where the keys had small
-// integer values.
+// I wrote this hash struct because I found that boost's integer pair hash
+// `boost::hash<pair<., .>>` gives a low range of values and doesn't perform as
+// well as expected in uses of hash containers where the keys in the input
+// distribution have small integer values.
 struct IntPairHasher {
   std::size_t operator()(const std::pair<std::size_t, std::size_t>& p) const;
 };
