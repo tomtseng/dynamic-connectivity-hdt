@@ -11,9 +11,13 @@ Another helpful description may be found in [MIT 6.851 Advanced Data Structures
 (Spring 2012) — Lecture 20: Dynamic Graphs
 II](https://www.youtube.com/watch?v=L7ywsci9ujo).
 
+### Requirements
+
+This code uses CMake version 2.8.12.2 and g++ version 5.5.0.
+
 ### Building
 
-This project uses CMake. Run the following shell commands:
+Run the following shell commands:
 
 ```
 mkdir build 
