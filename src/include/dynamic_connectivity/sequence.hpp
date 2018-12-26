@@ -38,8 +38,8 @@ class Element {
   // element.
   //
   // Returns a pair of elements {u, v} such that
-  // * u's sequence contains this element as well as all elements that
-  //   originally were before this element, and
+  // * u's sequence contains this element and all elements that were before this
+  //   element, and
   // * v's sequence contains all elements that were after this element.
   std::pair<Element*, Element*> Split();
 
