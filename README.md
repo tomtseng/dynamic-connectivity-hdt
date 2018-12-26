@@ -13,7 +13,7 @@ II](https://www.youtube.com/watch?v=L7ywsci9ujo).
 
 ### Requirements
 
-This code uses CMake version 3.13.2 and g++ version 5.5.0.
+This code uses CMake version 3.9.2 and g++ version 5.5.0.
 
 ### Building
 
