@@ -1,4 +1,4 @@
-#include <dynamic_connectivity/sequence.hpp>
+#include <sequence.hpp>
 
 #include <gtest/gtest.h>
 
