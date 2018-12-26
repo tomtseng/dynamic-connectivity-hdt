@@ -2,7 +2,7 @@
 // that has logarithmic height with respect to the number of elements in the
 // tree with high probability. Each element in the sequence is a treap node, and
 // the in-order traversal of the treap gives the sequence elements in order.
-#include <dynamic_connectivity/sequence.hpp>
+#include <sequence.hpp>
 
 #include <random>
 #include <stdexcept>
