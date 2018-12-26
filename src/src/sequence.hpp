@@ -43,6 +43,9 @@ class Element {
   // * v's sequence contains all elements that were after this element.
   std::pair<Element*, Element*> Split();
 
+  // Get element immediately preceding this element in the sequence.
+  Element* GetPredecessor() const;
+
  private:
   void AssignChild(bool direction, Element* child);
   Element* GetRoot() const;

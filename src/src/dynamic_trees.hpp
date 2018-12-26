@@ -1,12 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <stack>
 #include <unordered_map>
 #include <vector>
 
-#include <sequence.hpp>
-#include <utilities.hpp>
+#include "sequence.hpp"
+#include "utilities.hpp"
 
 // TODO comments
 class DynamicTrees {
@@ -26,8 +25,10 @@ class DynamicTrees {
 
  private:
   uint32_t num_vertices_;
-  std::stack<sequence::Element*> free_elements;
-  std::vector<sequence::Element*> vertices;
+  // TODO add comment explaining this
+  std::vector<sequence::Element> edge_elements_;
+  std::vector<sequence::Element*> free_edge_elements_;
+  std::vector<sequence::Element> vertices_;
   std::unordered_map<std::pair<uint32_t, uint32_t>, sequence::Element*, IntPairHasher>
-    edges;
+    edges_;
 };
