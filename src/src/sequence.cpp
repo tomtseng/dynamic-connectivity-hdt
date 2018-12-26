@@ -11,8 +11,8 @@ namespace sequence {
 
 namespace {
 
-  constexpr bool LEFT = 0;
-  constexpr bool RIGHT = 1;
+  constexpr bool kLeft = 0;
+  constexpr bool kRight = 1;
 
   std::mt19937 random_generator{0};
   std::uniform_int_distribution<uint32_t> priority_distribution{0, UINT32_MAX};
@@ -54,10 +54,10 @@ Element* Element::JoinRoots(Element* lesser, Element* greater) {
   }
 
   if (lesser->priority_ > greater->priority_) {
-    lesser->AssignChild(RIGHT, JoinRoots(lesser->children_[RIGHT], greater));
+    lesser->AssignChild(kRight, JoinRoots(lesser->children_[kRight], greater));
     return lesser;
   } else {
-    greater->AssignChild(LEFT, JoinRoots(lesser, greater->children_[LEFT]));
+    greater->AssignChild(kLeft, JoinRoots(lesser, greater->children_[kLeft]));
     return greater;
   }
 }
@@ -82,10 +82,10 @@ void Element::Join(Element* lesser, Element* greater) {
 
 std::pair<Element*, Element*> Element::Split() {
   Element* lesser{nullptr};
-  Element* greater{children_[RIGHT]};
-  if (children_[RIGHT] != nullptr) {
-    children_[RIGHT]->parent_ = nullptr;
-    AssignChild(RIGHT, nullptr);
+  Element* greater{children_[kRight]};
+  if (children_[kRight] != nullptr) {
+    children_[kRight]->parent_ = nullptr;
+    AssignChild(kRight, nullptr);
   }
 
   Element* current{this};
@@ -94,7 +94,7 @@ std::pair<Element*, Element*> Element::Split() {
   while (current != nullptr) {
     Element* parent{current->parent_};
     if (parent != nullptr) {
-      current_is_right_child = parent->children_[RIGHT] == current;
+      current_is_right_child = parent->children_[kRight] == current;
       parent->AssignChild(current_is_right_child, nullptr);
       current->parent_ = nullptr;
     }
@@ -108,6 +108,31 @@ std::pair<Element*, Element*> Element::Split() {
     current = parent;
   }
   return {lesser, greater};
+}
+
+Element* Element::GetPredecessor() const {
+  const Element* current{this};
+  if (current->children_[kLeft] == nullptr) {
+    // No left child. The predecessor is the first ancestor for which the start
+    // element falls in the ancestor's right subtree.
+    while (true) {
+      if (current->parent_ == nullptr) {
+        return nullptr;
+      } else if (current->parent_->children_[kRight] == current) {
+        return current->parent_;
+      } else {
+        current = current->parent_;
+      }
+    }
+  } else {
+    // The element has a left child. The predecessor is the right-most node in
+    // the left child's subtree.
+    current = current->children_[kLeft];
+    while (current->children_[kRight] != nullptr) {
+      current = current->children_[kRight];
+    }
+    return const_cast<Element*>(current);
+  }
 }
 
 }  // namespace sequence

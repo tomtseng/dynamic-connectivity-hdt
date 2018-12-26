@@ -43,7 +43,8 @@ class Element {
   // * v's sequence contains all elements that were after this element.
   std::pair<Element*, Element*> Split();
 
-  // Get element immediately preceding this element in the sequence.
+  // Get element immediately preceding this element in the sequence. Returns
+  // null if this element is the first element in the sequence.
   Element* GetPredecessor() const;
 
  private:
