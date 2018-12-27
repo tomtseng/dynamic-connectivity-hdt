@@ -27,7 +27,7 @@ TEST(DynamicTrees, LinkAndCutPathGraph) {
     }
   }
   for (uint32_t i = 0; i < kNumVertices; i++) {
-    for (uint32_t j = i + 1; i < kNumVertices; i++) {
+    for (uint32_t j = i + 1; j < kNumVertices; j++) {
       EXPECT_FALSE(dynamic_trees.IsConnected(i, j));
     }
   }
@@ -54,7 +54,7 @@ TEST(DynamicTrees, LinkAndCutStarGraph) {
     }
   }
   for (uint32_t i = 0; i < kNumVertices; i++) {
-    for (uint32_t j = i + 1; i < kNumVertices; i++) {
+    for (uint32_t j = i + 1; j < kNumVertices; j++) {
       EXPECT_FALSE(dynamic_trees.IsConnected(i, j));
     }
   }

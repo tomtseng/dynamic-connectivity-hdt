@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <utility>
 
 namespace sequence {
 
@@ -37,11 +36,12 @@ class Element {
   // Splits the sequence that this element lives in immediately after the
   // element.
   //
-  // Returns a pair of elements {u, v} such that
-  // * u's sequence contains this element and all elements that were before this
-  //   element, and
-  // * v's sequence contains all elements that were after this element.
-  std::pair<Element*, Element*> Split();
+  // After splitting, this element's sequence contains itself and all elements
+  // that were before this element, and the returned element's sequence contains
+  // all elements that were after the calling element.
+  //
+  // Returns what was formerly the successor of this element.
+  Element* Split();
 
   // Get element immediately preceding this element in the sequence. Returns
   // null if this element is the first element in the sequence.

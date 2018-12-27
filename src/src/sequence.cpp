@@ -82,8 +82,12 @@ void Element::Join(Element* lesser, Element* greater) {
   JoinWithRootReturned(lesser, greater);
 }
 
-std::pair<Element*, Element*> Element::Split() {
+Element* Element::Split() {
+  // `lesser` is the root of a sequence that will contain `this` and elements
+  // preceding `this`.
   Element* lesser{nullptr};
+  // `greater`is the root of a sequence that will contain all elements
+  // after `this`.
   Element* greater{children_[kRight]};
   if (children_[kRight] != nullptr) {
     children_[kRight]->parent_ = nullptr;
@@ -109,7 +113,13 @@ std::pair<Element*, Element*> Element::Split() {
     traversed_up_from_right = current_is_right_child;
     current = parent;
   }
-  return {lesser, greater};
+
+  // The former successor of `this` is the leftmost descendent of `greater`.
+  Element* successor = greater;
+  while (successor != nullptr && successor->children_[kLeft] != nullptr) {
+    successor = successor->children_[kLeft];
+  }
+  return successor;
 }
 
 Element* Element::GetPredecessor() const {

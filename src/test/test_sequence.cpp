@@ -16,20 +16,20 @@ TEST(Sequence, JoinAndSplit) {
   }
 
   static constexpr std::size_t kSplitIndex = (kNumElements - 1) / 2;
-  std::pair<seq::Element*, seq::Element*> split_result =
-    elements[kSplitIndex].Split();
+  seq::Element* split_successor = elements[kSplitIndex].Split();
+  EXPECT_EQ(split_successor, &elements[kSplitIndex + 1]);
   EXPECT_NE(
       elements[0].GetRepresentative(),
       elements[kNumElements - 1].GetRepresentative());
   for (std::size_t i = 0; i <= kSplitIndex; i++) {
     EXPECT_EQ(
         elements[i].GetRepresentative(),
-        split_result.first->GetRepresentative());
+        elements[kSplitIndex].GetRepresentative());
   }
   for (std::size_t i = kSplitIndex + 1; i < kNumElements; i++) {
     EXPECT_EQ(
         elements[i].GetRepresentative(),
-        split_result.second->GetRepresentative());
+        split_successor->GetRepresentative());
   }
 }
 
