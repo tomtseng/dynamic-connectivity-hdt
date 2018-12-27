@@ -8,9 +8,13 @@
 #include "sequence.hpp"
 #include "utilities.hpp"
 
-// TODO comments
+// This is a data structure for the dynamic trees problem. The dynamic trees
+// problem is to maintain a forest (undirected ayclic graph) as it undergoes
+// edge additions (links) and edge deletions (cuts).
+// TODO(comments)
 class DynamicTrees {
  public:
+  // Initializes forest with `num_vertices` vertices and no edges.
   explicit DynamicTrees(uint32_t num_vertices);
   ~DynamicTrees();
 

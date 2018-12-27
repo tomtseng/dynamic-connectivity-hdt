@@ -8,7 +8,9 @@ namespace sequence {
 // build bigger sequences from there.
 class Element {
  public:
+  // Initializes a single sequence element.
   Element();
+
   ~Element();
 
   // Don't allow copying or moving.
