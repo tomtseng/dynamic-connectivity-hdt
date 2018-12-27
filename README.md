@@ -19,7 +19,7 @@ This code uses CMake version 3.13.2 and g++ version 5.5.0.
 
 Run the following shell commands:
 
-```
+```bash
 mkdir build
 cd build
 cmake ..
