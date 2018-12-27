@@ -25,7 +25,7 @@ bool DynamicForest::IsConnected(uint32_t u, uint32_t v) {
   return vertices_[u].GetRepresentative() == vertices_[v].GetRepresentative();
 }
 
-void DynamicForest::Link(uint32_t u, uint32_t v) {
+void DynamicForest::AddEdge(uint32_t u, uint32_t v) {
   ASSERT_MSG(
       !IsConnected(u, v),
       "Vertices " << u << " and " << v << "are already connected");
@@ -47,7 +47,7 @@ void DynamicForest::Link(uint32_t u, uint32_t v) {
   Element::Join(&u_element, u_successor);
 }
 
-void DynamicForest::Cut(uint32_t u, uint32_t v) {
+void DynamicForest::DeleteEdge(uint32_t u, uint32_t v) {
   const auto uv_it{edges_.find(std::make_pair(u, v))};
   ASSERT_MSG(
       uv_it != edges_.end(),

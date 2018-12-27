@@ -2,17 +2,17 @@
 
 #include <gtest/gtest.h>
 
-TEST(DynamicForest, LinkAndCutPathGraph) {
+TEST(DynamicForest, AddEdgeAndDeleteEdgePathGraph) {
   constexpr uint32_t kNumVertices = 10;
   DynamicForest dynamic_forest(kNumVertices);
   for (uint32_t i = 1; i < kNumVertices; i++) {
-    dynamic_forest.Link(i - 1, i);
+    dynamic_forest.AddEdge(i - 1, i);
   }
   for (uint32_t i = 1; i < kNumVertices; i++) {
     EXPECT_TRUE(dynamic_forest.IsConnected(0, i));
   }
 
-  dynamic_forest.Cut(4, 5);
+  dynamic_forest.DeleteEdge(4, 5);
   EXPECT_FALSE(dynamic_forest.IsConnected(4, 5));
   for (uint32_t i = 0; i < 4; i++) {
     EXPECT_TRUE(dynamic_forest.IsConnected(4, i));
@@ -23,7 +23,7 @@ TEST(DynamicForest, LinkAndCutPathGraph) {
 
   for (uint32_t i = 1; i < kNumVertices; i++) {
     if (i != 5) {
-      dynamic_forest.Cut(i - 1, i);
+      dynamic_forest.DeleteEdge(i - 1, i);
     }
   }
   for (uint32_t i = 0; i < kNumVertices; i++) {
@@ -33,24 +33,24 @@ TEST(DynamicForest, LinkAndCutPathGraph) {
   }
 }
 
-TEST(DynamicForest, LinkAndCutStarGraph) {
+TEST(DynamicForest, AddEdgeAndDeleteEdgeStarGraph) {
   constexpr uint32_t kNumVertices = 10;
   DynamicForest dynamic_forest(kNumVertices);
   for (uint32_t i = 1; i < kNumVertices; i++) {
-    dynamic_forest.Link(0, i);
+    dynamic_forest.AddEdge(0, i);
   }
   for (uint32_t i = 1; i < kNumVertices; i++) {
     EXPECT_TRUE(dynamic_forest.IsConnected(0, i));
   }
 
-  dynamic_forest.Cut(0, 5);
+  dynamic_forest.DeleteEdge(0, 5);
   for (uint32_t i = 0; i < kNumVertices; i++) {
     EXPECT_EQ(dynamic_forest.IsConnected(0, i), i != 5);
   }
 
   for (uint32_t i = 1; i < kNumVertices; i++) {
     if (i != 5) {
-      dynamic_forest.Cut(0, i);
+      dynamic_forest.DeleteEdge(0, i);
     }
   }
   for (uint32_t i = 0; i < kNumVertices; i++) {
