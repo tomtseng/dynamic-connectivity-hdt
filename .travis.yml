@@ -1,5 +1,7 @@
 language: cpp
 dist: trusty
 compiler: gcc
-install: bash scripts/travis_install.bash
-script: bash scripts/travis_build.bash
+git:
+  depth: 1
+install: bash -v scripts/travis_install.bash
+script: bash -v scripts/travis_build.bash
