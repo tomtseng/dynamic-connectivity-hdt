@@ -1,16 +1,7 @@
 cmake_minimum_required(VERSION 3.13.2)
 project(dynamic_connectivity)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
-enable_testing()
-
-# Custom target for running ctest with more helpful output
-add_custom_target(check
-  COMMAND GTEST_COLOR=1 ${CMAKE_CTEST_COMMAND} --output-on-failure
-)
-
-## Google Test installation
+## Google Test installation {{{
 
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -32,6 +23,35 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
                  ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
                  EXCLUDE_FROM_ALL)
 
-## end Google Test installation
+## end Google Test installation }}}
+
+set(CMAKE_CXX_COMPILER "/usr/bin/g++-7")
+set(GCC_COMPILE_FLAGS "\
+  -std=c++17 \
+  \
+  -DDEBUG \
+  \
+  -pedantic \
+  -Wall \
+  -Wdouble-promotion \
+  -Wduplicated-branches \
+  -Wduplicated-cond \
+  -Werror \
+  -Wextra \
+  -Wlogical-op \
+  -Wnull-dereference \
+  -Wrestrict \
+  -Wshadow \
+  -Wold-style-cast \
+  -Wuseless-cast \
+")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
+
+enable_testing()
+
+# Custom target for running ctest with more helpful output
+add_custom_target(check
+  COMMAND GTEST_COLOR=1 ${CMAKE_CTEST_COMMAND} --output-on-failure
+)
 
 add_subdirectory(src)
