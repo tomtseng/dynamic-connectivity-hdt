@@ -12,17 +12,17 @@
 // problem is to maintain a forest (undirected ayclic graph) as it undergoes
 // edge additions (links) and edge deletions (cuts).
 // TODO(comments)
-class DynamicTrees {
+class DynamicForest {
  public:
   // Initializes forest with `num_vertices` vertices and no edges.
-  explicit DynamicTrees(uint32_t num_vertices);
-  ~DynamicTrees();
+  explicit DynamicForest(uint32_t num_vertices);
+  ~DynamicForest();
 
-  DynamicTrees() = delete;
-  DynamicTrees(const DynamicTrees &other) = delete;
-  DynamicTrees& operator=(const DynamicTrees& other) = delete;
-  DynamicTrees(DynamicTrees&& other) noexcept = delete;
-  DynamicTrees& operator=(DynamicTrees&& other) noexcept = delete;
+  DynamicForest() = delete;
+  DynamicForest(const DynamicForest &other) = delete;
+  DynamicForest& operator=(const DynamicForest& other) = delete;
+  DynamicForest(DynamicForest&& other) noexcept = delete;
+  DynamicForest& operator=(DynamicForest&& other) noexcept = delete;
 
   bool IsConnected(uint32_t u, uint32_t v);
   void Link(uint32_t u, uint32_t v);

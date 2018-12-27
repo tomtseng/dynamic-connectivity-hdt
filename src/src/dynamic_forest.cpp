@@ -1,4 +1,4 @@
-#include "dynamic_trees.hpp"
+#include "dynamic_forest.hpp"
 
 #include <stdexcept>
 
@@ -7,7 +7,7 @@
 using Element = sequence::Element;
 using std::pair;
 
-DynamicTrees::DynamicTrees(uint32_t num_vertices)
+DynamicForest::DynamicForest(uint32_t num_vertices)
     : num_vertices_(num_vertices) {
   vertices_ = std::vector<Element>(num_vertices_);
   const std::size_t num_edges{2 * (num_vertices_ - 1)};
@@ -19,13 +19,13 @@ DynamicTrees::DynamicTrees(uint32_t num_vertices)
   edges_.reserve(num_edges);
 }
 
-DynamicTrees::~DynamicTrees() {}
+DynamicForest::~DynamicForest() {}
 
-bool DynamicTrees::IsConnected(uint32_t u, uint32_t v) {
+bool DynamicForest::IsConnected(uint32_t u, uint32_t v) {
   return vertices_[u].GetRepresentative() == vertices_[v].GetRepresentative();
 }
 
-void DynamicTrees::Link(uint32_t u, uint32_t v) {
+void DynamicForest::Link(uint32_t u, uint32_t v) {
   ASSERT_MSG(
       !IsConnected(u, v),
       "Vertices " << u << " and " << v << "are already connected");
@@ -47,7 +47,7 @@ void DynamicTrees::Link(uint32_t u, uint32_t v) {
   Element::Join(&u_element, u_successor);
 }
 
-void DynamicTrees::Cut(uint32_t u, uint32_t v) {
+void DynamicForest::Cut(uint32_t u, uint32_t v) {
   const auto uv_it{edges_.find(std::make_pair(u, v))};
   ASSERT_MSG(
       uv_it != edges_.end(),

@@ -1,10 +1,10 @@
 include_directories(include)
 include_directories(src)
 
-add_library(lib_dynamic_trees STATIC
-  src/dynamic_trees.cpp
+add_library(lib_dynamic_forest STATIC
+  src/dynamic_forest.cpp
 )
-target_link_libraries(lib_dynamic_trees
+target_link_libraries(lib_dynamic_forest
   lib_sequence
   lib_utilities
 )
