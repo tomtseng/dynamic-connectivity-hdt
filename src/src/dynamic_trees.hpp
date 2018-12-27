@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "sequence.hpp"
@@ -29,6 +30,8 @@ class DynamicTrees {
   std::vector<sequence::Element> edge_elements_;
   std::vector<sequence::Element*> free_edge_elements_;
   std::vector<sequence::Element> vertices_;
-  std::unordered_map<std::pair<uint32_t, uint32_t>, sequence::Element*, IntPairHasher>
-    edges_;
+  std::unordered_map<
+    std::pair<uint32_t, uint32_t>,
+    sequence::Element*,
+    IntPairHasher> edges_;
 };

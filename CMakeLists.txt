@@ -28,6 +28,9 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-7")
 set(GCC_COMPILE_FLAGS "\
   -std=c++17 \
+  \
+  -DDEBUG \
+  \
   -pedantic \
   -Wall \
   -Wdouble-promotion \

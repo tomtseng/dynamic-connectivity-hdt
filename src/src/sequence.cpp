@@ -7,6 +7,8 @@
 #include <random>
 #include <stdexcept>
 
+#include "assert.hpp"
+
 namespace sequence {
 
 namespace {
@@ -68,9 +70,9 @@ Element* Element::JoinWithRootReturned(Element* lesser, Element* greater) {
   Element* const lesser_root = lesser == nullptr ? nullptr : lesser->GetRoot();
   Element* const greater_root =
     greater == nullptr ? nullptr : greater->GetRoot();
-  if (lesser_root == greater_root && lesser_root != nullptr) {
-    throw std::invalid_argument("Input nodes live in the same sequence");
-  }
+  ASSERT_MSG(
+      lesser_root != greater_root || lesser_root == nullptr,
+      "Input nodes live in the same sequence");
   return JoinRoots(
       lesser == nullptr ? nullptr : lesser->GetRoot(),
       greater == nullptr ? nullptr : greater->GetRoot());
