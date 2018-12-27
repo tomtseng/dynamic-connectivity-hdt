@@ -19,7 +19,7 @@
 using Element = sequence::Element;
 using std::pair;
 
-DynamicForest::DynamicForest(uint32_t num_vertices)
+DynamicForest::DynamicForest(uint64_t num_vertices)
     : num_vertices_(num_vertices) {
   vertices_ = std::vector<Element>(num_vertices_);
   const std::size_t max_num_edges{2 * (num_vertices_ - 1)};
@@ -33,11 +33,11 @@ DynamicForest::DynamicForest(uint32_t num_vertices)
 
 DynamicForest::~DynamicForest() {}
 
-bool DynamicForest::IsConnected(uint32_t u, uint32_t v) {
+bool DynamicForest::IsConnected(uint64_t u, uint64_t v) {
   return vertices_[u].GetRepresentative() == vertices_[v].GetRepresentative();
 }
 
-void DynamicForest::AddEdge(uint32_t u, uint32_t v) {
+void DynamicForest::AddEdge(uint64_t u, uint64_t v) {
   ASSERT_MSG(
       !IsConnected(u, v),
       "Vertices " << u << " and " << v << "are already connected");
@@ -59,7 +59,7 @@ void DynamicForest::AddEdge(uint32_t u, uint32_t v) {
   Element::Join(&u_element, u_successor);
 }
 
-void DynamicForest::DeleteEdge(uint32_t u, uint32_t v) {
+void DynamicForest::DeleteEdge(uint64_t u, uint64_t v) {
   const auto uv_it{edges_.find(std::make_pair(u, v))};
   ASSERT_MSG(
       uv_it != edges_.end(),

@@ -4,6 +4,7 @@
 // the in-order traversal of the treap gives the sequence elements in order.
 #include "sequence.hpp"
 
+#include <limits>
 #include <random>
 #include <stdexcept>
 
@@ -17,7 +18,8 @@ namespace {
   constexpr bool kRight = 1;
 
   std::mt19937 random_generator{0};
-  std::uniform_int_distribution<uint32_t> priority_distribution{0, UINT32_MAX};
+  std::uniform_int_distribution<uint32_t> priority_distribution{
+    0, std::numeric_limits<uint32_t>::max()};
 
 }  // namespace
 
