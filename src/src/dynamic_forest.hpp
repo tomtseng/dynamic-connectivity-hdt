@@ -14,6 +14,8 @@
 class DynamicForest {
  public:
   // Initializes forest with `num_vertices` vertices and no edges.
+  //
+  // Efficiency: Linear in the size of the forest.
   explicit DynamicForest(uint32_t num_vertices);
   ~DynamicForest();
 
@@ -25,16 +27,22 @@ class DynamicForest {
 
   // Returns true if vertices `u` and `v` are connected, i.e. are in the same
   // tree.
+  //
+  // Efficiency: Logarithmic in the size of the forest.
   bool IsConnected(uint32_t u, uint32_t v);
 
   // Adds edge between vertices `u` and `v`.
   //
   // Adding this edge must not create a cycle in the forest.
+  //
+  // Efficiency: Logarithmic in the size of the forest.
   void AddEdge(uint32_t u, uint32_t v);
 
   // Removes edge between vertices `u` and `v`.
   //
   // The edge (`u`, `v`) must be in the forest.
+  //
+  // Efficiency: Logarithmic in the size of the forest.
   void DeleteEdge(uint32_t u, uint32_t v);
 
  private:

@@ -9,6 +9,8 @@ namespace sequence {
 class Element {
  public:
   // Initializes a single sequence element.
+  //
+  // Efficiency: Constant.
   Element();
 
   ~Element();
@@ -27,12 +29,17 @@ class Element {
   // Two elements are in the same sequence if and only if their representatives
   // are the same. Representatives are invalidated after the sequence is
   // modified.
+  //
+  // Efficiency: Logarithmic in the size of the element's sequence.
   Element* GetRepresentative() const;
 
   // Concatenates the sequence containing `lesser` and the sequence containing
   // `greater`.
   //
   // `lesser` and `greater` must not live in the same sequence.
+  //
+  // Efficiency: Logarithmic in the sum of the sizes of `lesser` and `greater`'s
+  // sequences.
   static void Join(Element* lesser, Element* greater);
 
   // Splits the sequence that this element lives in immediately after the
@@ -43,10 +50,14 @@ class Element {
   // all elements that were after the calling element.
   //
   // Returns what was formerly the successor of this element.
+  //
+  // Efficiency: Logarithmic in the size of the element's sequence.
   Element* Split();
 
   // Get element immediately preceding this element in the sequence. Returns
   // null if this element is the first element in the sequence.
+  //
+  // Efficiency: Logarithmic in the size of the element's sequence.
   Element* GetPredecessor() const;
 
  private:
