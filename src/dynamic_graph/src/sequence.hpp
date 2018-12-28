@@ -70,7 +70,7 @@ class Element {
   Element* parent_;
   // Treap invariant: the priority of a node must be at least as great as the
   // priority of each of its children.
-  uint32_t priority_;
+  int64_t priority_;
 };
 
 }  // namespace sequence

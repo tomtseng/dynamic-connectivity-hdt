@@ -19,13 +19,16 @@
 using Element = sequence::Element;
 using std::pair;
 
-DynamicForest::DynamicForest(uint64_t num_vertices)
+DynamicForest::DynamicForest(int64_t num_vertices)
     : num_vertices_(num_vertices) {
+  ASSERT_MSG(
+      num_vertices_ > 0,
+      "The number of vertices of be positive.");
   vertices_ = std::vector<Element>(num_vertices_);
-  const std::size_t max_num_edges{2 * (num_vertices_ - 1)};
+  const int64_t max_num_edges{2 * (num_vertices_ - 1)};
   edge_elements_ = std::vector<Element>(max_num_edges);
   free_edge_elements_.reserve(max_num_edges);
-  for (std::size_t i = 0; i < max_num_edges; i++) {
+  for (int64_t i = 0; i < max_num_edges; i++) {
     free_edge_elements_.emplace_back(&edge_elements_[i]);
   }
   edges_.reserve(max_num_edges);
@@ -33,11 +36,15 @@ DynamicForest::DynamicForest(uint64_t num_vertices)
 
 DynamicForest::~DynamicForest() {}
 
-bool DynamicForest::IsConnected(uint64_t u, uint64_t v) {
+bool DynamicForest::IsConnected(int64_t u, int64_t v) {
+  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds.");
+  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds.");
   return vertices_[u].GetRepresentative() == vertices_[v].GetRepresentative();
 }
 
-void DynamicForest::AddEdge(uint64_t u, uint64_t v) {
+void DynamicForest::AddEdge(int64_t u, int64_t v) {
+  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds.");
+  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds.");
   ASSERT_MSG(
       !IsConnected(u, v),
       "Vertices " << u << " and " << v << "are already connected");
@@ -59,7 +66,7 @@ void DynamicForest::AddEdge(uint64_t u, uint64_t v) {
   Element::Join(&u_element, u_successor);
 }
 
-void DynamicForest::DeleteEdge(uint64_t u, uint64_t v) {
+void DynamicForest::DeleteEdge(int64_t u, int64_t v) {
   const auto uv_it{edges_.find(std::make_pair(u, v))};
   ASSERT_MSG(
       uv_it != edges_.end(),
