@@ -16,7 +16,7 @@ class DynamicForest {
   // Initializes forest with `num_vertices` vertices and no edges.
   //
   // Efficiency: Linear in the size of the forest.
-  explicit DynamicForest(uint64_t num_vertices);
+  explicit DynamicForest(int64_t num_vertices);
   ~DynamicForest();
 
   DynamicForest() = delete;
@@ -29,24 +29,26 @@ class DynamicForest {
   // tree.
   //
   // Efficiency: Logarithmic in the size of the forest.
-  bool IsConnected(uint64_t u, uint64_t v);
+  bool IsConnected(int64_t u, int64_t v);
 
   // Adds edge between vertices `u` and `v`.
   //
   // Adding this edge must not create a cycle in the forest.
   //
   // Efficiency: Logarithmic in the size of the forest.
-  void AddEdge(uint64_t u, uint64_t v);
+  void AddEdge(int64_t u, int64_t v);
 
   // Removes edge between vertices `u` and `v`.
   //
   // The edge (`u`, `v`) must be in the forest.
   //
   // Efficiency: Logarithmic in the size of the forest.
-  void DeleteEdge(uint64_t u, uint64_t v);
+  void DeleteEdge(int64_t u, int64_t v);
 
  private:
-  uint64_t num_vertices_;
+  void AssertVertexInBounds(int64_t v);
+
+  int64_t num_vertices_;
   std::vector<sequence::Element> vertices_;
   // We preallocate all sequence elements for edges in `edge_elements_` and
   // maintain a list of unused elements in `free_edge_elements_`. The used
@@ -55,7 +57,7 @@ class DynamicForest {
   std::vector<sequence::Element> edge_elements_;
   std::vector<sequence::Element*> free_edge_elements_;
   std::unordered_map<
-    std::pair<uint64_t, uint64_t>,
+    std::pair<int64_t, int64_t>,
     sequence::Element*,
     IntPairHasher> edges_;
 };

@@ -18,8 +18,8 @@ namespace {
   constexpr bool kRight = 1;
 
   std::mt19937 random_generator{0};
-  std::uniform_int_distribution<uint32_t> priority_distribution{
-    0, std::numeric_limits<uint32_t>::max()};
+  std::uniform_int_distribution<int64_t> priority_distribution{
+    std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()};
 
 }  // namespace
 
