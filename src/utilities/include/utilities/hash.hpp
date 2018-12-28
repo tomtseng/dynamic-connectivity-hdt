@@ -1,7 +1,3 @@
-// Miscellaneous utility functions.
-//
-// Consider splitting groups of functions into separate files if this file
-// becomes bloated.
 #pragma once
 
 #include <utility>
