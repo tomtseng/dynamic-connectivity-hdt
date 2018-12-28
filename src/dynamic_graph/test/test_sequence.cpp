@@ -4,6 +4,19 @@
 
 namespace seq = sequence;
 
+TEST(Sequence, CopyConstructorMultipleElements) {
+  seq::Element elements[2];
+  seq::Element::Join(&elements[0], &elements[1]);
+  EXPECT_DEATH(
+      seq::Element newElement{elements[0]},
+      "Copied element cannot live in a sequence of multiple elements");
+}
+
+TEST(Sequence, CopyConstructorSingleElement) {
+  seq::Element element;
+  seq::Element newElement{element};  // expect no death
+}
+
 TEST(Sequence, JoinAndSplit) {
   static constexpr std::size_t kNumElements = 4;
   seq::Element elements[kNumElements];
@@ -57,4 +70,23 @@ TEST(Sequence, GetPredecessor) {
   for (std::size_t i = 1; i < kNumElements; i++) {
     EXPECT_EQ(elements[i].GetPredecessor(), &elements[i - 1]);
   }
+}
+
+TEST(Sequence, MoveConstructor) {
+  seq::Element elements[3];
+  seq::Element::Join(&elements[0], &elements[1]);
+  seq::Element::Join(&elements[1], &elements[2]);
+
+  seq::Element movedElement1 = std::move(elements[1]);
+  EXPECT_EQ(movedElement1.GetRepresentative(), elements[0].GetRepresentative());
+  EXPECT_EQ(movedElement1.GetRepresentative(), elements[2].GetRepresentative());
+
+  seq::Element movedElement0 = std::move(elements[0]);
+  seq::Element movedElement2 = std::move(elements[2]);
+  EXPECT_EQ(
+      movedElement1.GetRepresentative(),
+      movedElement0.GetRepresentative());
+  EXPECT_EQ(
+      movedElement1.GetRepresentative(),
+      movedElement2.GetRepresentative());
 }

@@ -46,7 +46,8 @@ class DynamicForest {
   void DeleteEdge(int64_t u, int64_t v);
 
  private:
-  void AssertVertexInBounds(int64_t v);
+  sequence::Element* AllocateEdgeElement(int64_t u, int64_t v);
+  void FreeEdgeElement(sequence::Element* edge);
 
   int64_t num_vertices_;
   std::vector<sequence::Element> vertices_;
