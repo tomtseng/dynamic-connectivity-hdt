@@ -1,4 +1,4 @@
-#include "sequence.hpp"
+#include <sequence/sequence.hpp>
 
 #include <gtest/gtest.h>
 

@@ -5,8 +5,8 @@
 #include <utility>
 #include <vector>
 
-#include "sequence.hpp"
-#include "utilities.hpp"
+#include <sequence/sequence.hpp>
+#include <utilities/hash.hpp>
 
 // This is a data structure for the dynamic trees problem. The dynamic trees
 // problem is to maintain a forest (undirected acyclic graph) as it undergoes

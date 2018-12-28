@@ -1,4 +1,4 @@
-#include "utilities.hpp"
+#include <utilities/hash.hpp>
 
 std::size_t CombineHashes(std::size_t hash1, std::size_t hash2) {
   // Same as boost's 32-bit `hash_combine` implementation, but with a 64-bit

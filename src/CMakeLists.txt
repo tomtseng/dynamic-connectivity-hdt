@@ -1,18 +1,3 @@
-include_directories(include)
-include_directories(src)
-
-add_library(lib_dynamic_forest STATIC
-  src/dynamic_forest.cpp
-)
-target_link_libraries(lib_dynamic_forest
-  lib_sequence
-  lib_utilities
-)
-add_library(lib_sequence STATIC
-  src/sequence.cpp
-)
-add_library(lib_utilities STATIC
-  src/utilities.cpp
-)
-
-add_subdirectory(test)
+add_subdirectory(dynamic_graph)
+add_subdirectory(sequence)
+add_subdirectory(utilities)
