@@ -11,7 +11,7 @@ namespace sequence {
 class Element {
  public:
   // Initializes a single sequence element.
-  Element(const std::pair<int64_t, int64_t>& id);
+  explicit Element(const std::pair<int64_t, int64_t>& id);
   Element();
 
   ~Element();
