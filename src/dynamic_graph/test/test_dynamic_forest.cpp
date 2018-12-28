@@ -1,4 +1,4 @@
-#include <dynamic_graph/dynamic_forest.hpp>
+#include <dynamic_forest.hpp>
 
 #include <gtest/gtest.h>
 
