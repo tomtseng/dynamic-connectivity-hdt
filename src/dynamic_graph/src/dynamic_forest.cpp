@@ -10,7 +10,7 @@
 // corresponds to a small number of splits and concatenations on the tours.
 // Tarjan's variant adds self-loop edges to each vertex and includes them in the
 // Euler tour to make it convenient to look up where a vertex is in the tours.
-#include <dynamic_graph/dynamic_forest.hpp>
+#include <dynamic_forest.hpp>
 
 #include <stdexcept>
 

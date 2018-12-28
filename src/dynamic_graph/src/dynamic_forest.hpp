@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include <sequence/sequence.hpp>
+#include <sequence.hpp>
 #include <utilities/hash.hpp>
 
 // This is a data structure for the dynamic trees problem. The dynamic trees
