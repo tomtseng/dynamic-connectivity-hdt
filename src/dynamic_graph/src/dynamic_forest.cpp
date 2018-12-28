@@ -24,9 +24,16 @@ DynamicForest::DynamicForest(int64_t num_vertices)
   ASSERT_MSG(
       num_vertices_ > 0,
       "The number of vertices of be positive.");
-  vertices_ = std::vector<Element>(num_vertices_);
+
+  vertices_.reserve(num_vertices_);
+  for (int64_t i = 0; i < num_vertices_; i++) {
+    vertices_.emplace_back(std::make_pair(i, i));
+  }
+
   const int64_t max_num_edges{2 * (num_vertices_ - 1)};
-  edge_elements_ = std::vector<Element>(max_num_edges);
+  edge_elements_ = std::vector<Element>{
+    static_cast<std::size_t>(max_num_edges),
+    Element{std::make_pair(-1, -1)}};
   free_edge_elements_.reserve(max_num_edges);
   for (int64_t i = 0; i < max_num_edges; i++) {
     free_edge_elements_.emplace_back(&edge_elements_[i]);
@@ -35,6 +42,18 @@ DynamicForest::DynamicForest(int64_t num_vertices)
 }
 
 DynamicForest::~DynamicForest() {}
+
+sequence::Element* DynamicForest::AllocateEdgeElement(int64_t u, int64_t v) {
+  sequence::Element* edge{free_edge_elements_.back()};
+  free_edge_elements_.pop_back();
+  edge->id_ = std::make_pair(u, v);
+  return edge;
+}
+
+void DynamicForest::FreeEdgeElement(sequence::Element* edge) {
+  edge->id_ = std::make_pair(-1, -1);
+  free_edge_elements_.emplace_back(edge);
+}
 
 bool DynamicForest::IsConnected(int64_t u, int64_t v) {
   ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds.");
@@ -48,10 +67,9 @@ void DynamicForest::AddEdge(int64_t u, int64_t v) {
   ASSERT_MSG(
       !IsConnected(u, v),
       "Vertices " << u << " and " << v << "are already connected");
-  Element* uv{free_edge_elements_.back()};
-  free_edge_elements_.pop_back();
-  Element* vu{free_edge_elements_.back()};
-  free_edge_elements_.pop_back();
+
+  Element* uv{AllocateEdgeElement(u, v)};
+  Element* vu{AllocateEdgeElement(v, u)};
   edges_[std::make_pair(u, v)] = uv;
   edges_[std::make_pair(v, u)] = vu;
 
@@ -98,10 +116,10 @@ void DynamicForest::DeleteEdge(int64_t u, int64_t v) {
   // (v, u) preceding (u, v). Thus the two edge elements are not adjacent.
   Element* uv_predecessor{uv_element->GetPredecessor()};
   uv_predecessor->Split();
-  free_edge_elements_.emplace_back(uv_element);
+  FreeEdgeElement(uv_element);
   Element* vu_predecessor{vu_element->GetPredecessor()};
   vu_predecessor->Split();
-  free_edge_elements_.emplace_back(vu_element);
+  FreeEdgeElement(vu_element);
   if (is_uv_before_vu_in_tour) {
     Element::Join(uv_predecessor, vu_successor);
   } else {

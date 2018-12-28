@@ -14,8 +14,8 @@ namespace sequence {
 
 namespace {
 
-  constexpr bool kLeft = 0;
-  constexpr bool kRight = 1;
+  constexpr bool kLeft{0};
+  constexpr bool kRight{1};
 
   std::mt19937 random_generator{0};
   std::uniform_int_distribution<int64_t> priority_distribution{
@@ -23,12 +23,45 @@ namespace {
 
 }  // namespace
 
-Element::Element()
-  : children_{nullptr, nullptr}
-  , parent_{nullptr}
+Element::Element(const std::pair<int64_t, int64_t>& id)
+  : id_{id}
   , priority_{priority_distribution(random_generator)} {}
+Element::Element()
+  : priority_{priority_distribution(random_generator)} {}
 
 Element::~Element() {}
+
+Element::Element(const Element &other)
+    : id_{other.id_}
+    , children_{nullptr, nullptr}
+    , parent_{nullptr}
+    , priority_{priority_distribution(random_generator)} {
+  ASSERT_MSG(
+      other.parent_ == nullptr
+        && other.children_[kLeft] == nullptr
+        && other.children_[kRight] == nullptr,
+      "Copied element cannot live in a sequence of multiple elements");
+}
+
+Element::Element(Element&& other) noexcept
+    : id_{other.id_}
+    , children_{other.children_}
+    , parent_{other.parent_}
+    , priority_{other.priority_} {
+  if (parent_ != nullptr) {
+    if (parent_->children_[kLeft] == &other) {
+      parent_->children_[kLeft] = this;
+    } else {
+      parent_->children_[kRight] = this;
+    }
+  }
+  if (children_[kLeft] != nullptr) {
+    children_[kLeft]->parent_ = this;
+  }
+  if (children_[kRight] != nullptr) {
+    children_[kRight]->parent_ = this;
+  }
+}
 
 void Element::AssignChild(bool direction, Element* child) {
   if (child != nullptr) {

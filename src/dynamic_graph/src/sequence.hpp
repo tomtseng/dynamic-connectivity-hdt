@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <array>
+#include <utility>
 
 namespace sequence {
 
@@ -9,20 +11,20 @@ namespace sequence {
 class Element {
  public:
   // Initializes a single sequence element.
-  //
-  // Efficiency: Constant.
+  Element(const std::pair<int64_t, int64_t>& id);
   Element();
 
   ~Element();
 
-  // Don't allow copying or moving.
-  // Document these functions if you implement them. Does copying copy the whole
-  // sequence? Is it the user's responsibility to deallocate the copied
-  // sequence?
-  Element(const Element &other) = delete;
-  Element& operator=(const Element& other) = delete;
-  Element(Element&& other) noexcept = delete;
-  Element& operator=(Element&& other) noexcept = delete;
+  // Copies elements that are in single-element sequences. Copying will throw an
+  // exception if attempted on an element that lives in a sequence of several
+  // elements.
+  Element(const Element &other);
+  Element& operator=(const Element& other) = delete;  // unimplemented
+  // Moves element. Other elements that point to the moved element will be
+  // changed to point to the new element.
+  Element(Element&& other) noexcept;
+  Element& operator=(Element&& other) noexcept = delete;  // unimplemented
 
   // Returns a representative of the sequence that the element lives in.
   //
@@ -60,14 +62,20 @@ class Element {
   // Efficiency: Logarithmic in the size of the element's sequence.
   Element* GetPredecessor() const;
 
+  // Identifier for the element.
+  //
+  // This is specialized for storing Euler tour elements. The identifier can
+  // store what edge this element represents.
+  std::pair<int64_t, int64_t> id_{-1, -1};
+
  private:
   void AssignChild(bool direction, Element* child);
   Element* GetRoot() const;
   static Element* JoinRoots(Element* lesser, Element* greater);
   static Element* JoinWithRootReturned(Element* lesser, Element* greater);
 
-  Element* children_[2];
-  Element* parent_;
+  std::array<Element*, 2> children_{nullptr, nullptr};
+  Element* parent_{nullptr};
   // Treap invariant: the priority of a node must be at least as great as the
   // priority of each of its children.
   int64_t priority_;
