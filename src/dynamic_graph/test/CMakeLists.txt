@@ -1,5 +1,17 @@
 include (GoogleTest)
 
+add_executable(test_dynamic_connectivity
+  test_dynamic_connectivity.cpp
+)
+target_include_directories(test_dynamic_connectivity PRIVATE
+  ../include
+)
+target_link_libraries(test_dynamic_connectivity
+  gtest_main
+  lib_dynamic_connectivity
+)
+gtest_discover_tests(test_dynamic_connectivity)
+
 add_executable(test_dynamic_forest
   test_dynamic_forest.cpp
 )
