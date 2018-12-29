@@ -1,8 +1,11 @@
 #include <sequence.hpp>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace seq = sequence;
+
+using ::testing::Optional;
 
 TEST(Sequence, CopyConstructorMultipleElements) {
   seq::Element elements[2];
@@ -17,33 +20,43 @@ TEST(Sequence, CopyConstructorSingleElement) {
   seq::Element newElement{element};  // expect no death
 }
 
-TEST(Sequence, JoinAndSplit) {
-  static constexpr std::size_t kNumElements = 4;
-  seq::Element elements[kNumElements];
-  for (std::size_t i = 1; i < kNumElements; i++) {
-    EXPECT_NE(elements[0].GetRepresentative(), elements[i].GetRepresentative());
+TEST(Sequence, GetPredecessor) {
+  seq::Element elements[10];
+  for (int32_t i = 1; i < 10; i++) {
     seq::Element::Join(&elements[0], &elements[i]);
   }
-  for (std::size_t i = 1; i < kNumElements; i++) {
+  EXPECT_EQ(elements[0].GetPredecessor(), nullptr);
+  for (int32_t i = 1; i < 10; i++) {
+    EXPECT_EQ(elements[i].GetPredecessor(), &elements[i - 1]);
+  }
+}
+
+TEST(Sequence, JoinAndSplitAndGetSize) {
+  seq::Element elements[4];
+  EXPECT_EQ(elements[0].GetSize(), 1);
+  for (int32_t i = 1; i < 4; i++) {
+    EXPECT_NE(elements[0].GetRepresentative(), elements[i].GetRepresentative());
+    seq::Element::Join(&elements[0], &elements[i]);
+    EXPECT_EQ(elements[0].GetSize(), i + 1);
+  }
+  for (int32_t i = 1; i < 4; i++) {
     EXPECT_EQ(elements[0].GetRepresentative(), elements[i].GetRepresentative());
   }
 
-  static constexpr std::size_t kSplitIndex = (kNumElements - 1) / 2;
-  seq::Element* split_successor = elements[kSplitIndex].Split();
-  EXPECT_EQ(split_successor, &elements[kSplitIndex + 1]);
+  seq::Element* split_successor{elements[1].Split()};
+  EXPECT_EQ(split_successor, &elements[2]);
   EXPECT_NE(
       elements[0].GetRepresentative(),
-      elements[kNumElements - 1].GetRepresentative());
-  for (std::size_t i = 0; i <= kSplitIndex; i++) {
-    EXPECT_EQ(
-        elements[i].GetRepresentative(),
-        elements[kSplitIndex].GetRepresentative());
-  }
-  for (std::size_t i = kSplitIndex + 1; i < kNumElements; i++) {
-    EXPECT_EQ(
-        elements[i].GetRepresentative(),
-        split_successor->GetRepresentative());
-  }
+      elements[3].GetRepresentative());
+  EXPECT_EQ(elements[1].GetRepresentative(), elements[0].GetRepresentative());
+  EXPECT_EQ(
+      split_successor->GetRepresentative(),
+      elements[2].GetRepresentative());
+  EXPECT_EQ(
+      split_successor->GetRepresentative(),
+      elements[3].GetRepresentative());
+  EXPECT_EQ(elements[0].GetSize(), 2);
+  EXPECT_EQ(elements[3].GetSize(), 2);
 }
 
 TEST(Sequence, JoinAndSplitEmptySequences) {
@@ -58,18 +71,31 @@ TEST(Sequence, JoinAndSplitEmptySequences) {
   seq::Element::Join(nullptr, &elements[1]);
   elements[1].Split();
   EXPECT_EQ(elements[0].GetRepresentative(), elements[1].GetRepresentative());
+  EXPECT_EQ(elements[0].GetSize(), 2);
 }
 
-TEST(Sequence, GetPredecessor) {
-  static constexpr std::size_t kNumElements = 10;
-  seq::Element elements[kNumElements];
-  for (std::size_t i = 1; i < kNumElements; i++) {
-    seq::Element::Join(&elements[0], &elements[i]);
-  }
-  EXPECT_EQ(elements[0].GetPredecessor(), nullptr);
-  for (std::size_t i = 1; i < kNumElements; i++) {
-    EXPECT_EQ(elements[i].GetPredecessor(), &elements[i - 1]);
-  }
+TEST(Sequence, Mark) {
+  seq::Element elements[2];
+  EXPECT_FALSE(elements[0].FindMarkedElement(0).has_value());
+
+  elements[0].Mark(0, true);
+  EXPECT_THAT(elements[0].FindMarkedElement(0), Optional(&elements[0]));
+  EXPECT_FALSE(elements[1].FindMarkedElement(0).has_value());
+
+  seq::Element::Join(&elements[0], &elements[1]);
+  EXPECT_THAT(elements[1].FindMarkedElement(0), Optional(&elements[0]));
+
+  elements[1].Mark(1, true);
+  EXPECT_THAT(elements[0].FindMarkedElement(1), Optional(&elements[1]));
+  EXPECT_THAT(elements[1].FindMarkedElement(1), Optional(&elements[1]));
+
+  elements[0].Mark(0, false);
+  EXPECT_FALSE(elements[0].FindMarkedElement(0).has_value());
+  EXPECT_FALSE(elements[1].FindMarkedElement(0).has_value());
+
+  elements[0].Split();
+  EXPECT_FALSE(elements[0].FindMarkedElement(1).has_value());
+  EXPECT_THAT(elements[1].FindMarkedElement(1), Optional(&elements[1]));
 }
 
 TEST(Sequence, MoveConstructor) {
@@ -77,12 +103,12 @@ TEST(Sequence, MoveConstructor) {
   seq::Element::Join(&elements[0], &elements[1]);
   seq::Element::Join(&elements[1], &elements[2]);
 
-  seq::Element movedElement1 = std::move(elements[1]);
+  seq::Element movedElement1{std::move(elements[1])};
   EXPECT_EQ(movedElement1.GetRepresentative(), elements[0].GetRepresentative());
   EXPECT_EQ(movedElement1.GetRepresentative(), elements[2].GetRepresentative());
 
-  seq::Element movedElement0 = std::move(elements[0]);
-  seq::Element movedElement2 = std::move(elements[2]);
+  seq::Element movedElement0{std::move(elements[0])};
+  seq::Element movedElement2{std::move(elements[2])};
   EXPECT_EQ(
       movedElement1.GetRepresentative(),
       movedElement0.GetRepresentative());

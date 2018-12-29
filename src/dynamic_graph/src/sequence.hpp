@@ -1,10 +1,36 @@
+// This is a data structure for storing lists of elements.
+//
+// It is augmented to be used for representing tours in Euler tour trees,
+// which are in turn specialized for use in Holm et al.'s dynamic connectivity
+// algorithm. This use-case-specific augmentation could be abstracted out, but
+// it's not worth the effort for this small project.
 #pragma once
 
 #include <cstdint>
 #include <array>
+#include <optional>
 #include <utility>
 
 namespace sequence {
+
+namespace detail {
+
+// Augmented info for each node about the node's subtree.
+// Specialized for use in Holm et al.'s dynamic connectivity algorithm.
+struct SubtreeData {
+  // Size of this node's subtree.
+  int64_t size{1};
+
+  // `has_marked[i]` stores whether any node in this subtree has `marked[i]`
+  // true.
+  std::array<bool, 2> has_marked{{false, false}};
+};
+// Specialized for use in Holm et al.'s dynamic connectivity algorithm.
+struct NodeData {
+  std::array<bool, 2> marked{{false, false}};
+};
+
+}
 
 // Usage: create single-element sequences with the `Element()` constructor, and
 // build bigger sequences from there.
@@ -32,15 +58,21 @@ class Element {
   // are the same. Representatives are invalidated after the sequence is
   // modified.
   //
-  // Efficiency: Logarithmic in the size of the element's sequence.
+  // Efficiency: logarithmic in the size of the element's sequence.
   Element* GetRepresentative() const;
+
+  // Get element immediately preceding this element in the sequence. Returns
+  // null if this element is the first element in the sequence.
+  //
+  // Efficiency: logarithmic in the size of the element's sequence.
+  Element* GetPredecessor() const;
 
   // Concatenates the sequence containing `lesser` and the sequence containing
   // `greater`.
   //
   // `lesser` and `greater` must not live in the same sequence.
   //
-  // Efficiency: Logarithmic in the sum of the sizes of `lesser` and `greater`'s
+  // Efficiency: logarithmic in the sum of the sizes of `lesser` and `greater`'s
   // sequences.
   static void Join(Element* lesser, Element* greater);
 
@@ -53,14 +85,24 @@ class Element {
   //
   // Returns what was formerly the successor of this element.
   //
-  // Efficiency: Logarithmic in the size of the element's sequence.
+  // Efficiency: logarithmic in the size of the element's sequence.
   Element* Split();
 
-  // Get element immediately preceding this element in the sequence. Returns
-  // null if this element is the first element in the sequence.
+  // Returns size of the sequence that the element lives in.
   //
-  // Efficiency: Logarithmic in the size of the element's sequence.
-  Element* GetPredecessor() const;
+  // Efficiency: logarithmic in the size of the element's sequence.
+  int64_t GetSize() const;
+
+  // Mark (if `mark` is true) or unmark (if `mark` is false) the element at
+  // index `index`. See `FindMarkedElement`.
+  //
+  // Efficiency: logarithmic in the size of the element's sequence.
+  void Mark(int32_t index, bool mark);
+  // Return an element in the calling element's sequence that is marked at its
+  // `index`-th index if such an element exists.
+  //
+  // Efficiency: logarithmic in the size of the element's sequence.
+  std::optional<Element*> FindMarkedElement(int32_t index) const;
 
   // Identifier for the element.
   //
@@ -70,15 +112,19 @@ class Element {
 
  private:
   void AssignChild(bool direction, Element* child);
+  detail::SubtreeData GetChildSubtreeData(bool direction) const;
   Element* GetRoot() const;
   static Element* JoinRoots(Element* lesser, Element* greater);
   static Element* JoinWithRootReturned(Element* lesser, Element* greater);
+  void UpdateSubtreeData();
 
   std::array<Element*, 2> children_{nullptr, nullptr};
   Element* parent_{nullptr};
   // Treap invariant: the priority of a node must be at least as great as the
   // priority of each of its children.
   int64_t priority_;
+  detail::NodeData node_data_{};
+  detail::SubtreeData subtree_data_{};
 };
 
 }  // namespace sequence

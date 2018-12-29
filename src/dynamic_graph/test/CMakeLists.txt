@@ -19,6 +19,7 @@ target_include_directories(test_sequence PRIVATE
   ../src
 )
 target_link_libraries(test_sequence
+  gmock
   gtest_main
   lib_sequence
 )

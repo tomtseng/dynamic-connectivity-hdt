@@ -31,7 +31,6 @@ set(GCC_COMPILE_FLAGS "\
   \
   -DDEBUG \
   \
-  -pedantic \
   -Wall \
   -Wdouble-promotion \
   -Wduplicated-branches \
