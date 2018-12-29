@@ -30,7 +30,7 @@ struct NodeData {
   std::array<bool, 2> marked{{false, false}};
 };
 
-}
+}  // namespace detail
 
 // Usage: create single-element sequences with the `Element()` constructor, and
 // build bigger sequences from there.
