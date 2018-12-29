@@ -9,19 +9,17 @@
 #include <cstdint>
 
 /**
- * This class represents an undirected graph. It allows efficient edge
+ * This class represents an undirected graph that can undergo efficient edge
  * insertions, edge deletions, and connectivity queries.
  */
 class DynamicConnectivity {
  public:
   /** Initializes an empty graph with a fixed number of vertices.
    *
-   *
-   *
    *  Efficiency: \f$ O(n \log n ) \f$ where \f$ n \f$ is the number of vertices
    *  in the graph.
    *
-   *  @param[in]: num_vertices Number of vertices in the graph.
+   *  @param[in] num_vertices Number of vertices in the graph.
    */
   explicit DynamicConnectivity(int64_t num_vertices);
 
