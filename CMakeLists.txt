@@ -31,7 +31,6 @@ find_package(Doxygen)
 if (NOT DOXYGEN_FOUND)
   message(WARNING
       "doxygen not found - doxygen documentation will not be available.")
-    return()
 endif()
 
 set(docs_directory "${CMAKE_SOURCE_DIR}/docs/")
@@ -42,7 +41,6 @@ add_custom_target(docs
 )
 
 ## end Doxygen}}}
-
 
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-7")
 set(GCC_COMPILE_FLAGS "\
