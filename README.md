@@ -14,13 +14,13 @@ want to be able to answer queries of the form "are vertices x and y connected?"
 
 The relevant header file is `dynamic_connectivity.hpp`.
 
-The data structure implemented in this repository is described in the paper
-[_Poly-Logarithmic Deterministic Fully-Dynamic Algorithms for Connectivity,
-Minimum Spanning Tree, 2-Edge, and
+The data structure implemented in this repository is described in section 2 of
+the paper [_Poly-Logarithmic Deterministic Fully-Dynamic Algorithms for
+Connectivity, Minimum Spanning Tree, 2-Edge, and
 Biconnectivity_](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.89.919&rep=rep1&type=pdf).
-Another helpful description is in the lecture [MIT 6.851 Advanced Data Structures
-(Spring 2012) — Lecture 20: Dynamic Graphs
-II](https://www.youtube.com/watch?v=L7ywsci9ujo). The data structure achieves O(log^2 n)
+Another helpful description is in the lecture [MIT 6.851 Advanced Data
+Structures (Spring 2012) — Lecture 20: Dynamic Graphs
+II](https://youtu.be/L7ywsci9ujo?t=3140). The data structure achieves O(log^2 n)
 amortized time edge insertions and deletions and O(log n) time connectivity
 queries. (This repository does not implement the extra trick of using a B-tree
 to reduce the time complexity for connectivity queries from O(log n) to O(n /
@@ -47,6 +47,6 @@ make docs # optional: make documentation files in docs/html/
 
 ## References
 
-J. Holm, K. de Lichtenberg, and M. Thorup. Poly-logarithmic deterministic
-fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge, and
-biconnectivity. _J. ACM_, 48(4), 2001.
+Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. Poly-logarithmic
+deterministic fully-dynamic algorithms for connectivity, minimum spanning tree,
+2-edge, and biconnectivity. _Journal of the ACM_, 48(4):723–760, 2001.
