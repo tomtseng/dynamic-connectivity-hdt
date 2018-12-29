@@ -60,7 +60,8 @@ class DynamicConnectivity {
    *
    *  The edge must not already be in the graph.
    *
-   *  Efficiency: logarithmic in the size of the graph.
+   *  Efficiency: \f$ O\left( \log^2 n \right) \f$ amortized where \f$ n \f$ is
+   *  the number of vertices in the graph.
    *
    *  @param[in] u Vertex.
    *  @param[in] v Vertex.
@@ -71,7 +72,8 @@ class DynamicConnectivity {
    *
    *  The edge must be in the graph.
    *
-   *  Efficiency: logarithmic in the size of the graph.
+   *  Efficiency: \f$ O\left( \log^2 n \right) \f$ amortized where \f$ n \f$ is
+   *  the number of vertices in the graph.
    *
    *  @param[in] u Vertex.
    *  @param[in] v Vertex.
