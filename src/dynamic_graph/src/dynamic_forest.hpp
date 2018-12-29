@@ -49,7 +49,7 @@ class DynamicForest {
   // Efficiency: logarithmic in the size of the forest.
   void DeleteEdge(int64_t u, int64_t v);
 
-  // Returns size of the tree that vertex `v` resides in.
+  // Returns the number of vertices in the tree that vertex `v` resides in.
   //
   // Efficiency: logarithmic in the size of the forest.
   int64_t GetSizeOfTree(int64_t v) const;
