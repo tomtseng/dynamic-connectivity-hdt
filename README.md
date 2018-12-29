@@ -31,6 +31,7 @@ cd build
 cmake ..
 make
 make check # run tests
+make docs # optional: make documentation files
 ```
 
 ## References

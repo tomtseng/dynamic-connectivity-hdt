@@ -25,6 +25,25 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 
 ## end Google Test installation }}}
 
+## Doxygen {{{
+
+find_package(Doxygen)
+if (NOT DOXYGEN_FOUND)
+  message(WARNING
+      "doxygen not found - doxygen documentation will not be available.")
+    return()
+endif()
+
+set(docs_directory "${CMAKE_SOURCE_DIR}/docs/")
+
+add_custom_target(docs
+  COMMENT "--- Generating documentation ---"
+  COMMAND cd ${docs_directory} && doxygen
+)
+
+## end Doxygen}}}
+
+
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-7")
 set(GCC_COMPILE_FLAGS "\
   -std=c++17 \
@@ -50,6 +69,7 @@ enable_testing()
 
 # Custom target for running ctest with more helpful output
 add_custom_target(check
+  COMMENT "--- Running tests ---"
   COMMAND GTEST_COLOR=1 ${CMAKE_CTEST_COMMAND} --output-on-failure
 )
 
