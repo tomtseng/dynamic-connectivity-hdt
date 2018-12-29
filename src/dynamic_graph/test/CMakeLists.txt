@@ -7,6 +7,7 @@ target_include_directories(test_dynamic_forest PRIVATE
   ../src
 )
 target_link_libraries(test_dynamic_forest
+  gmock
   gtest_main
   lib_dynamic_forest
 )
