@@ -6,7 +6,6 @@ target_link_libraries(lib_dynamic_forest
   lib_sequence
 )
 target_include_directories(lib_dynamic_forest PUBLIC
-  ${CMAKE_SOURCE_DIR}/src/sequence/include
   ${CMAKE_SOURCE_DIR}/src/utilities/include
 )
 target_include_directories(lib_dynamic_forest PRIVATE
