@@ -3,25 +3,36 @@
 This is an implementation of Holm et al.'s data structure for dynamic
 connectivity.
 
-## Data structure
+## About dynamic connectivity
 
-The data structure is described in the paper
+### Problem
+
+We have an undirected graph undergoing edge insertions and edge deletions. We
+want to be able to answer queries of the form "are vertices x and y connected?"
+
+### Data structure
+
+The relevant header file is `dynamic_connectivity.hpp`.
+
+The data structure implemented in this repository is described in the paper
 [_Poly-Logarithmic Deterministic Fully-Dynamic Algorithms for Connectivity,
 Minimum Spanning Tree, 2-Edge, and
 Biconnectivity_](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.89.919&rep=rep1&type=pdf).
 Another helpful description is in the lecture [MIT 6.851 Advanced Data Structures
 (Spring 2012) — Lecture 20: Dynamic Graphs
-II](https://www.youtube.com/watch?v=L7ywsci9ujo).
+II](https://www.youtube.com/watch?v=L7ywsci9ujo). The data structure achieves O(log^2 n)
+amortized time edge insertions and deletions and O(log n) time connectivity
+queries. (This repository does not implement the extra trick of using a B-tree
+to reduce the time complexity for connectivity queries from O(log n) to O(n /
+log log n).)
 
-We implement this data structure in this repository, minus the extra trick to
-reduce the complexity for connectivity queries from O(log n) to O(n / log log
-n). The relevant header file is `dynamic_connectivity.hpp`.
+## Building
 
-## Requirements
+### Requirements
 
 This code uses CMake version 3.13.2 and g++ version 7.4.0 on Linux.
 
-## Building
+### Commands
 
 Run the following shell commands:
 
@@ -31,7 +42,7 @@ cd build
 cmake ..
 make
 make check # run tests
-make docs # optional: make documentation files
+make docs # optional: make documentation files in docs/html/
 ```
 
 ## References
