@@ -44,12 +44,12 @@ class DynamicForest {
 
   // Removes edge between vertices `u` and `v`.
   //
-  // The edge (`u`, `v`) must be in the forest.
+  // The edge must be in the forest.
   //
   // Efficiency: logarithmic in the size of the forest.
   void DeleteEdge(int64_t u, int64_t v);
 
-  // Returns size of the tree that vertex `v` resides in.
+  // Returns the number of vertices in the tree that vertex `v` resides in.
   //
   // Efficiency: logarithmic in the size of the forest.
   int64_t GetSizeOfTree(int64_t v) const;
@@ -62,7 +62,7 @@ class DynamicForest {
   // Analagous to `GetEdge`.
   void MarkVertex(int64_t v, bool mark);
   // Finds an edge in the tree that vertex `v` resides in that was marked by
-  // `MarkEdge(., ., true)`
+  // `MarkEdge(., ., true)`.
   //
   // Efficiency: logarithmic in the size of the forest.
   std::optional<std::pair<int64_t, int64_t>>
