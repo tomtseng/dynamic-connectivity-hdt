@@ -17,14 +17,36 @@
 #include <utilities/assert.hpp>
 
 using Element = sequence::Element;
+using UndirectedEdgeElements = detail::UndirectedEdgeElements;
 using std::pair;
 
 namespace {
 
-  constexpr int32_t kEdgeMark = 0;
-  constexpr int32_t kVertexMark = 1;
+constexpr int32_t kEdgeMark = 0;
+constexpr int32_t kVertexMark = 1;
+
+inline void ValidateEdge(const UndirectedEdge& edge, int64_t num_vertices) {
+  ASSERT_MSG(
+      0 <= edge.first && edge.first < num_vertices
+        && 0 <= edge.second && edge.second < num_vertices,
+      "Edge " << edge << " out of bounds");
+}
+
+inline void ValidateVertex(Vertex v, int64_t num_vertices) {
+  ASSERT_MSG(0 <= v && v < num_vertices, "Vertex " << v << " out of bounds");
+}
 
 }  // namespace
+
+namespace detail {
+
+UndirectedEdgeElements::UndirectedEdgeElements(
+      sequence::Element* _forward_edge,
+      sequence::Element* _backward_edge)
+  : forward_edge(_forward_edge), backward_edge(_backward_edge) {}
+
+}  // namespace detail
+
 
 DynamicForest::DynamicForest(int64_t num_vertices)
     : num_vertices_(num_vertices) {
@@ -62,42 +84,55 @@ DynamicForest::DynamicForest(DynamicForest&& other) noexcept
     , free_edge_elements_{std::move(other.free_edge_elements_)}
     , edges_{std::move(other.edges_)} {}
 
-sequence::Element* DynamicForest::AllocateEdgeElement(int64_t u, int64_t v) {
-  sequence::Element* edge{free_edge_elements_.back()};
+// Allocates Euler tour sequence elements for an edge in the forest.
+UndirectedEdgeElements DynamicForest::AllocateEdgeElements(
+    const UndirectedEdge& edge) {
+  UndirectedEdgeElements edge_elements{
+    free_edge_elements_[free_edge_elements_.size() - 1],
+    free_edge_elements_[free_edge_elements_.size() - 2]
+  };
   free_edge_elements_.pop_back();
-  edge->id_ = std::make_pair(u, v);
-  return edge;
+  free_edge_elements_.pop_back();
+  edge_elements.forward_edge->id_ = std::make_pair(edge.first, edge.second);
+  edge_elements.backward_edge->id_ = std::make_pair(edge.second, edge.first);
+  return edge_elements;
 }
 
-void DynamicForest::FreeEdgeElement(sequence::Element* edge) {
-  edge->id_ = std::make_pair(-1, -1);
-  edge->Mark(kEdgeMark, false);
-  edge->Mark(kVertexMark, false);
-  free_edge_elements_.emplace_back(edge);
+void DynamicForest::FreeEdgeElements(
+    const UndirectedEdgeElements& edge_elements) {
+  edge_elements.forward_edge->id_ = std::make_pair(-1, -1);
+  edge_elements.backward_edge->id_ = std::make_pair(-1, -1);
+  edge_elements.forward_edge->Mark(kEdgeMark, false);
+  edge_elements.backward_edge->Mark(kEdgeMark, false);
+  free_edge_elements_.emplace_back(edge_elements.forward_edge);
+  free_edge_elements_.emplace_back(edge_elements.backward_edge);
 }
 
-bool DynamicForest::IsConnected(int64_t u, int64_t v) const {
-  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds");
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
+bool DynamicForest::IsConnected(Vertex u, Vertex v) const {
+  ValidateVertex(u, num_vertices_);
+  ValidateVertex(v, num_vertices_);
   return vertices_[u].GetRepresentative() == vertices_[v].GetRepresentative();
 }
 
-void DynamicForest::AddEdge(int64_t u, int64_t v) {
-  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds");
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
-  ASSERT_MSG(
-      !IsConnected(u, v),
-      "Vertices " << u << " and " << v << "are already connected");
+bool DynamicForest::HasEdge(const UndirectedEdge& edge) const {
+  ValidateEdge(edge, num_vertices_);
+  return edges_.find(edge) != edges_.end();
+}
 
-  Element* uv{AllocateEdgeElement(u, v)};
-  Element* vu{AllocateEdgeElement(v, u)};
-  edges_[std::make_pair(u, v)] = uv;
-  edges_[std::make_pair(v, u)] = vu;
+void DynamicForest::AddEdge(const UndirectedEdge& edge) {
+  ValidateEdge(edge, num_vertices_);
 
-  auto& u_element = vertices_[u];
-  const auto& u_successor = vertices_[u].Split();
-  auto& v_element = vertices_[v];
-  const auto& v_successor = vertices_[v].Split();
+  UndirectedEdgeElements edge_elements{AllocateEdgeElements(edge)};
+  edges_.emplace(edge, edge_elements);
+
+  const Vertex u{edge.first};
+  const Vertex v{edge.second};
+  Element* const uv{edge_elements.forward_edge};
+  Element* const vu{edge_elements.backward_edge};
+  Element& u_element{vertices_[u]};
+  Element* const u_successor{vertices_[u].Split()};
+  Element& v_element{vertices_[v]};
+  Element* const& v_successor{vertices_[v].Split()};
   Element::Join(&u_element, uv);
   Element::Join(&u_element, v_successor);
   Element::Join(&u_element, &v_element);
@@ -105,80 +140,82 @@ void DynamicForest::AddEdge(int64_t u, int64_t v) {
   Element::Join(&u_element, u_successor);
 }
 
-void DynamicForest::DeleteEdge(int64_t u, int64_t v) {
-  const auto uv_it{edges_.find(std::make_pair(u, v))};
+void DynamicForest::DeleteEdge(const UndirectedEdge& edge) {
+  const auto edge_it{edges_.find(edge)};
   ASSERT_MSG(
-      uv_it != edges_.end(),
-      "No edge exists between vertices " << u << " and " << v);
-  const auto vu_it{edges_.find(std::make_pair(v, u))};
-  const auto& uv_element = uv_it->second;
-  const auto& vu_element = vu_it->second;
-  edges_.erase(uv_it);
-  edges_.erase(vu_it);
+      edge_it != edges_.end(),
+      "Edge " << edge << " is not in the forest.");
+  UndirectedEdgeElements edge_elements{edge_it->second};
+  Element* const uv{edge_elements.forward_edge};
+  Element* const vu{edge_elements.backward_edge};
+  edges_.erase(edge_it);
 
-  const auto& uv_successor = uv_element->Split();
+  Element* const uv_successor{uv->Split()};
   // After splitting the tour, we'll need to know whether edge (u, v) appeared
   // before (v, u) or not in the tour in order to know how to join everything
   // back together.
   const bool is_uv_before_vu_in_tour{
-    uv_element->GetRepresentative() != vu_element->GetRepresentative()};
-  const auto& vu_successor = vu_it->second->Split();
+    uv->GetRepresentative() != vu->GetRepresentative()};
+  Element* const vu_successor{vu->Split()};
   // There's a few edge cases to think about here.
   //
   // - Q: How do we know `uv_predecessor` and `vu_predecessor` aren't null?
   // - A: The `AddEdge` and `DeleteEdge` functions maintain that a sequence
   // always starts with an element representing a vertex.
   //
-  // - Q: We're marking `uv_element` and `vu_element` as unused. How do we know
-  // that none of `uv_predecessor`, `vu_predecessor`, `uv_successor`, and
-  // `vu_successor` point to either of them?
+  // - Q: We're marking `uv` and `vu` as unused. How do we know that none of
+  // `uv_predecessor`, `vu_predecessor`, `uv_successor`, and `vu_successor`
+  // point to either of them?
   // - A: Edge (u, v) can't immediately precede (v, u) in the tour because
   // the element for vertex v must fall somewhere in between. Likewise for
   // (v, u) preceding (u, v). Thus the two edge elements are not adjacent.
-  Element* uv_predecessor{uv_element->GetPredecessor()};
+  Element* const uv_predecessor{uv->GetPredecessor()};
   uv_predecessor->Split();
-  FreeEdgeElement(uv_element);
-  Element* vu_predecessor{vu_element->GetPredecessor()};
+  Element* const vu_predecessor{vu->GetPredecessor()};
   vu_predecessor->Split();
-  FreeEdgeElement(vu_element);
   if (is_uv_before_vu_in_tour) {
     Element::Join(uv_predecessor, vu_successor);
   } else {
     Element::Join(vu_predecessor, uv_successor);
   }
+  FreeEdgeElements(edge_elements);
 }
 
-int64_t DynamicForest::GetSizeOfTree(int64_t v) const {
+int64_t DynamicForest::GetSizeOfTree(Vertex v) const {
+  ValidateVertex(v, num_vertices_);
   return vertices_[v].GetSize();
 }
 
 
-void DynamicForest::MarkEdge(int64_t u, int64_t v, bool mark) {
-  const auto uv_it{edges_.find(std::make_pair(u, v))};
+void DynamicForest::MarkEdge(const UndirectedEdge& edge, bool mark) {
+  ValidateEdge(edge, num_vertices_);
+  const auto edge_it{edges_.find(edge)};
   ASSERT_MSG(
-      uv_it != edges_.end(),
-      "No edge exists between vertices " << u << " and " << v);
-  uv_it->second->Mark(kEdgeMark, mark);
+      edge_it != edges_.end(),
+      "Edge " << edge << " is not in the forest.");
+  edge_it->second.forward_edge->Mark(kEdgeMark, mark);
+  edge_it->second.backward_edge->Mark(kEdgeMark, mark);
 }
 
-void DynamicForest::MarkVertex(int64_t v, bool mark) {
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
+void DynamicForest::MarkVertex(Vertex v, bool mark) {
+  ValidateVertex(v, num_vertices_);
   vertices_[v].Mark(kVertexMark, mark);
 }
 
-std::optional<std::pair<int64_t, int64_t>>
-DynamicForest::GetMarkedEdgeInTree(int64_t v) const {
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
+std::optional<UndirectedEdge>
+DynamicForest::GetMarkedEdgeInTree(Vertex v) const {
+  ValidateVertex(v, num_vertices_);
   std::optional<Element*> edge{vertices_[v].FindMarkedElement(kEdgeMark)};
   if (edge.has_value()) {
-    return (*edge)->id_;
+    const auto [edge_endpoint, edge_endpoint2]{(*edge)->id_};
+    return UndirectedEdge{edge_endpoint, edge_endpoint2};
   } else {
     return {};
   }
 }
 
-std::optional<int64_t> DynamicForest::GetMarkedVertexInTree(int64_t v) const {
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
+std::optional<int64_t> DynamicForest::GetMarkedVertexInTree(Vertex v) const {
+  ValidateVertex(v, num_vertices_);
   std::optional<Element*> edge{vertices_[v].FindMarkedElement(kVertexMark)};
   if (edge.has_value()) {
     return (*edge)->id_.first;
