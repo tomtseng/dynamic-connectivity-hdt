@@ -52,7 +52,6 @@ set(GCC_COMPILE_FLAGS "\
   -Wdouble-promotion \
   -Wduplicated-branches \
   -Wduplicated-cond \
-  -Werror \
   -Wextra \
   -Wlogical-op \
   -Wnull-dereference \

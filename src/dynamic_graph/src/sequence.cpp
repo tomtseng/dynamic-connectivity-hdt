@@ -38,7 +38,7 @@ Element::Element(const Element &other)
     , priority_{priority_distribution(random_generator)}
     , node_data_{other.node_data_}
     , subtree_data_{other.subtree_data_} {
-  ASSERT_MSG(
+  ASSERT_MSG_ALWAYS(
       other.parent_ == nullptr
         && other.children_[kLeft] == nullptr
         && other.children_[kRight] == nullptr,

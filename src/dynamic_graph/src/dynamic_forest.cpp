@@ -50,6 +50,18 @@ DynamicForest::DynamicForest(int64_t num_vertices)
 
 DynamicForest::~DynamicForest() {}
 
+DynamicForest::DynamicForest(const DynamicForest& other)
+  : DynamicForest{other.num_vertices_} {
+  ASSERT_MSG_ALWAYS(other.edges_.empty(), "Copied forest must have no edges");
+}
+
+DynamicForest::DynamicForest(DynamicForest&& other) noexcept
+    : num_vertices_{other.num_vertices_}
+    , vertices_{std::move(other.vertices_)}
+    , edge_elements_{std::move(other.edge_elements_)}
+    , free_edge_elements_{std::move(other.free_edge_elements_)}
+    , edges_{std::move(other.edges_)} {}
+
 sequence::Element* DynamicForest::AllocateEdgeElement(int64_t u, int64_t v) {
   sequence::Element* edge{free_edge_elements_.back()};
   free_edge_elements_.pop_back();
