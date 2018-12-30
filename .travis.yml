@@ -8,11 +8,11 @@ addons:
   apt:
     update: true
     sources:
-      - sourceline: 'ppa:dluxen/boost'
+      - sourceline: 'ppa:mhier/libboost-latest'
       - ubuntu-toolchain-r-test
     packages:
       - g++-7
-      - boost1.67
+      - boost1.68
 install:
   ## Install CMake 3.13.2
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
