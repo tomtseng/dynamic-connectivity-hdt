@@ -36,11 +36,11 @@ DynamicConnectivity::DynamicConnectivity(int64_t num_vertices)
   // TODO
 }
 
-bool DynamicConnectivity::IsConnected(int64_t u, int64_t v) const {
+bool DynamicConnectivity::IsConnected(Vertex u, Vertex v) const {
   return spanning_forests_[0].IsConnected(u, v);
 }
 
-int64_t DynamicConnectivity::GetSizeOfConnectedComponent(int64_t v) const {
+int64_t DynamicConnectivity::GetSizeOfConnectedComponent(Vertex v) const {
   return spanning_forests_[0].GetSizeOfTree(v);
 }
 

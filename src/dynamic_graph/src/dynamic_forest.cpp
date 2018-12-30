@@ -214,7 +214,7 @@ DynamicForest::GetMarkedEdgeInTree(Vertex v) const {
   }
 }
 
-std::optional<int64_t> DynamicForest::GetMarkedVertexInTree(Vertex v) const {
+std::optional<Vertex> DynamicForest::GetMarkedVertexInTree(Vertex v) const {
   ValidateVertex(v, num_vertices_);
   std::optional<Element*> edge{vertices_[v].FindMarkedElement(kVertexMark)};
   if (edge.has_value()) {
