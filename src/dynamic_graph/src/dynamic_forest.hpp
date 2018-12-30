@@ -21,12 +21,15 @@ class DynamicForest {
   //
   // Efficiency: linear in the size of the forest.
   explicit DynamicForest(int64_t num_vertices);
+  DynamicForest() = delete;
+
   ~DynamicForest();
 
-  DynamicForest() = delete;
-  DynamicForest(const DynamicForest &other) = delete;
+  // Only copies forests that have no edges.
+  DynamicForest(const DynamicForest& other);
   DynamicForest& operator=(const DynamicForest& other) = delete;
-  DynamicForest(DynamicForest&& other) noexcept = delete;
+
+  DynamicForest(DynamicForest&& other) noexcept;
   DynamicForest& operator=(DynamicForest&& other) noexcept = delete;
 
   // Returns true if vertices `u` and `v` are connected, i.e. are in the same
@@ -74,7 +77,7 @@ class DynamicForest {
   sequence::Element* AllocateEdgeElement(int64_t u, int64_t v);
   void FreeEdgeElement(sequence::Element* edge);
 
-  int64_t num_vertices_;
+  const int64_t num_vertices_;
   std::vector<sequence::Element> vertices_;
   // We preallocate all sequence elements for edges in `edge_elements_` and
   // maintain a list of unused elements in `free_edge_elements_`. The used

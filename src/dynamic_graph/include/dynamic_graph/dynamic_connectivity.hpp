@@ -32,7 +32,7 @@ class DynamicConnectivity {
   /** The default constructor is invalid. */
   DynamicConnectivity() = delete;
   /** Copy constructor not implemented. */
-  DynamicConnectivity(const DynamicConnectivity &other) = delete;
+  DynamicConnectivity(const DynamicConnectivity& other) = delete;
   /** Copy assignment not implemented. */
   DynamicConnectivity& operator=(const DynamicConnectivity& other) = delete;
   /** Move constructor not implemented. */
@@ -84,6 +84,6 @@ class DynamicConnectivity {
   void DeleteEdge(int64_t u, int64_t v);
 
  private:
-  int64_t num_vertices_;
+  const int64_t num_vertices_;
   std::vector<DynamicForest> spanning_forests_;
 };
