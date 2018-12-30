@@ -7,6 +7,9 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+
+#include <dynamic_forest.hpp>
 
 /**
  * This class represents an undirected graph that can undergo efficient edge
@@ -82,4 +85,5 @@ class DynamicConnectivity {
 
  private:
   int64_t num_vertices_;
+  std::vector<DynamicForest> spanning_forests_;
 };

@@ -1,8 +1,14 @@
 add_library(lib_dynamic_connectivity STATIC
   src/dynamic_connectivity.cpp
 )
+target_link_libraries(lib_dynamic_connectivity
+  lib_dynamic_forest
+)
 target_include_directories(lib_dynamic_connectivity PRIVATE
   include
+)
+target_include_directories(lib_dynamic_connectivity PUBLIC
+  src
 )
 
 add_library(lib_dynamic_forest STATIC
@@ -13,10 +19,8 @@ target_link_libraries(lib_dynamic_forest
   lib_sequence
 )
 target_include_directories(lib_dynamic_forest PUBLIC
-  ${CMAKE_SOURCE_DIR}/src/utilities/include
-)
-target_include_directories(lib_dynamic_forest PRIVATE
   src
+  ${CMAKE_SOURCE_DIR}/src/utilities/include
 )
 
 add_library(lib_sequence STATIC
