@@ -47,12 +47,11 @@ UndirectedEdgeElements::UndirectedEdgeElements(
 
 }  // namespace detail
 
-
 DynamicForest::DynamicForest(int64_t num_vertices)
     : num_vertices_(num_vertices) {
   ASSERT_MSG_ALWAYS(
       num_vertices_ > 0,
-      "The number of vertices be positive");
+      "The number of vertices must be positive");
 
   vertices_.reserve(num_vertices_);
   for (int64_t i = 0; i < num_vertices_; i++) {
@@ -141,7 +140,7 @@ void DynamicForest::AddEdge(const UndirectedEdge& edge) {
 }
 
 void DynamicForest::DeleteEdge(const UndirectedEdge& edge) {
-  const auto edge_it{edges_.find(edge)};
+  const auto& edge_it{edges_.find(edge)};
   ASSERT_MSG(
       edge_it != edges_.end(),
       "Edge " << edge << " is not in the forest.");
@@ -189,7 +188,7 @@ int64_t DynamicForest::GetSizeOfTree(Vertex v) const {
 
 void DynamicForest::MarkEdge(const UndirectedEdge& edge, bool mark) {
   ValidateEdge(edge, num_vertices_);
-  const auto edge_it{edges_.find(edge)};
+  const auto& edge_it{edges_.find(edge)};
   ASSERT_MSG(
       edge_it != edges_.end(),
       "Edge " << edge << " is not in the forest.");
