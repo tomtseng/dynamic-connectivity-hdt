@@ -28,9 +28,9 @@ namespace {
 
 DynamicForest::DynamicForest(int64_t num_vertices)
     : num_vertices_(num_vertices) {
-  ASSERT_MSG(
+  ASSERT_MSG_ALWAYS(
       num_vertices_ > 0,
-      "The number of vertices of be positive.");
+      "The number of vertices be positive");
 
   vertices_.reserve(num_vertices_);
   for (int64_t i = 0; i < num_vertices_; i++) {
@@ -77,14 +77,14 @@ void DynamicForest::FreeEdgeElement(sequence::Element* edge) {
 }
 
 bool DynamicForest::IsConnected(int64_t u, int64_t v) const {
-  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds.");
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds.");
+  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds");
+  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
   return vertices_[u].GetRepresentative() == vertices_[v].GetRepresentative();
 }
 
 void DynamicForest::AddEdge(int64_t u, int64_t v) {
-  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds.");
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds.");
+  ASSERT_MSG(0 <= u && u < num_vertices_, "Vertex " << u << " out of bounds");
+  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
   ASSERT_MSG(
       !IsConnected(u, v),
       "Vertices " << u << " and " << v << "are already connected");
@@ -162,13 +162,13 @@ void DynamicForest::MarkEdge(int64_t u, int64_t v, bool mark) {
 }
 
 void DynamicForest::MarkVertex(int64_t v, bool mark) {
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds.");
+  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
   vertices_[v].Mark(kVertexMark, mark);
 }
 
 std::optional<std::pair<int64_t, int64_t>>
 DynamicForest::GetMarkedEdgeInTree(int64_t v) const {
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds.");
+  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
   std::optional<Element*> edge{vertices_[v].FindMarkedElement(kEdgeMark)};
   if (edge.has_value()) {
     return (*edge)->id_;
@@ -178,7 +178,7 @@ DynamicForest::GetMarkedEdgeInTree(int64_t v) const {
 }
 
 std::optional<int64_t> DynamicForest::GetMarkedVertexInTree(int64_t v) const {
-  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds.");
+  ASSERT_MSG(0 <= v && v < num_vertices_, "Vertex " << v << " out of bounds");
   std::optional<Element*> edge{vertices_[v].FindMarkedElement(kVertexMark)};
   if (edge.has_value()) {
     return (*edge)->id_.first;
