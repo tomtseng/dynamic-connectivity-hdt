@@ -15,6 +15,11 @@ namespace sequence {
 
 namespace detail {
 
+enum Direction {
+  kLeft = 0,
+  kRight
+};
+
 // Augmented info for each node about the node's subtree.
 // Specialized for use in Holm et al.'s dynamic connectivity algorithm.
 struct SubtreeData {
@@ -111,8 +116,8 @@ class Element {
   std::pair<int64_t, int64_t> id_{-1, -1};
 
  private:
-  void AssignChild(bool direction, Element* child);
-  detail::SubtreeData GetChildSubtreeData(bool direction) const;
+  void AssignChild(detail::Direction direction, Element* child);
+  detail::SubtreeData GetChildSubtreeData(detail::Direction direction) const;
   Element* GetRoot() const;
   static Element* JoinRoots(Element* lesser, Element* greater);
   static Element* JoinWithRootReturned(Element* lesser, Element* greater);
