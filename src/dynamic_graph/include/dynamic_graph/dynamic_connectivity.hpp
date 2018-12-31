@@ -8,12 +8,34 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include <dynamic_forest.hpp>
+#include <dynamic_graph/graph.hpp>
+#include <utilities/hash.hpp>
+
+namespace detail {
+
+typedef int8_t Level;
+
+enum class EdgeType {
+  // Edge is in the spanning forest of the graph.
+  kNonTree,
+  // Edge is not in the spanning forest of the graph.
+  kTree,
+};
+
+struct EdgeInfo {
+  Level level;
+  EdgeType type;
+};
+
+}  // namespace detail
 
 /** This class represents an undirected graph that can undergo efficient edge
- *  insertions, edge deletions, and connectivity queries.
+ *  insertions, edge deletions, and connectivity queries. Multiple edges between
+ *  a pair of vertices are supported.
  */
 class DynamicConnectivity {
  public:
@@ -29,16 +51,18 @@ class DynamicConnectivity {
   /** Deallocates the data structure. */
   ~DynamicConnectivity();
 
-  /** The default constructor is invalid. */
+  /** The default constructor is invalid because the number of vertices in the
+   *  graph must be known. */
   DynamicConnectivity() = delete;
   /** Copy constructor not implemented. */
   DynamicConnectivity(const DynamicConnectivity& other) = delete;
   /** Copy assignment not implemented. */
   DynamicConnectivity& operator=(const DynamicConnectivity& other) = delete;
-  /** Move constructor not implemented. */
-  DynamicConnectivity(DynamicConnectivity&& other) noexcept = delete;
+
+  /** Move constructor. */
+  DynamicConnectivity(DynamicConnectivity&& other) noexcept;
   /** Move assignment not implemented. */
-  DynamicConnectivity& operator=(DynamicConnectivity&& other) noexcept = delete;
+  DynamicConnectivity& operator=(DynamicConnectivity&& other) noexcept;
 
   /** Returns true if vertices \p u and \p v are connected in the graph.
    *
@@ -49,6 +73,15 @@ class DynamicConnectivity {
    *  @returns True if \p u and \p v are connected, false if they are not.
    */
   bool IsConnected(Vertex u, Vertex v) const;
+
+  /** Returns true if edge \p edge is in the graph.
+   *
+   *  Efficiency: constant on average.
+   *
+   *  @param[in] edge Edge.
+   *  @returns True if \p edge is in the graph, false if it is not.
+   */
+  bool HasEdge(const UndirectedEdge& edge) const;
 
   /** Returns the number of vertices in `v`'s connected component.
    *
@@ -61,7 +94,7 @@ class DynamicConnectivity {
 
   /** Adds an edge to the graph.
    *
-   *  The edge must not already be in the graph.
+   *  The edge must not already be in the graph and must not be a self-loop edge.
    *
    *  Efficiency: \f$ O\left( \log^2 n \right) \f$ amortized where \f$ n \f$ is
    *  the number of vertices in the graph.
@@ -72,7 +105,7 @@ class DynamicConnectivity {
 
   /** Deletes an edge from the graph.
    *
-   *  The edge must be in the graph.
+   *  An exception will be thrown if the edge is not in the graph.
    *
    *  Efficiency: \f$ O\left( \log^2 n \right) \f$ amortized where \f$ n \f$ is
    *  the number of vertices in the graph.
@@ -82,15 +115,23 @@ class DynamicConnectivity {
   void DeleteEdge(const UndirectedEdge& edge);
 
  private:
+  void AddNonTreeEdge(const UndirectedEdge& edge);
+  void AddTreeEdge(const UndirectedEdge& edge);
+  void AddEdgeToAdjacencyList(const UndirectedEdge& edge, detail::Level level);
+  void DeleteEdgeFromAdjacencyList(
+      const UndirectedEdge& edge, detail::Level level);
+  void ReplaceTreeEdge(const UndirectedEdge& edge, detail::Level level);
+
   const int64_t num_vertices_;
   // `spanning_forests_[i]` stores F_i, the spanning forest for the i-th
-  // subgraph.
+  // subgraph. In particular, `spanning_forests[0]` is a spanning forest for the
+  // whole graph.
   std::vector<DynamicForest> spanning_forests_;
   // `adjacency_lists_by_level_[i][v]` contains the vertices connected to vertex
-  // v by level-i non-tree edges (edges not in the spanning forests).
-  std::vector<std::vector<std::vector<Vertex>>>
-    non_tree_adjacency_lists_by_level_;
-  // Maps non-tree edges to their levels.
-  std::unordered_map<UndirectedEdge, int8_t, UndirectedEdgeHash>
-    non_tree_edge_to_level_;
+  // v by level-i non-tree edges.
+  std::vector<std::vector<std::unordered_set<Vertex>>>
+    non_tree_adjacency_lists_;
+  // All edges in the graph.
+  std::unordered_map<UndirectedEdge, detail::EdgeInfo, UndirectedEdgeHash>
+    edges_;
 };

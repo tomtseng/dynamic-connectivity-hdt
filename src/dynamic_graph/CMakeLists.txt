@@ -5,11 +5,10 @@ target_link_libraries(lib_dynamic_connectivity
   lib_assert
   lib_dynamic_forest
   lib_graph
-)
-target_include_directories(lib_dynamic_connectivity PRIVATE
-  ${CMAKE_SOURCE_DIR}/src/utilities/include
+  lib_hash
 )
 target_include_directories(lib_dynamic_connectivity PUBLIC
+  ${CMAKE_SOURCE_DIR}/src/utilities/include
   include
   src
 )
