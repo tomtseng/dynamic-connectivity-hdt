@@ -14,6 +14,15 @@
 // amortizing the cost of looking at an edge in a subgraph by moving it into
 // another subgraph and making sure that no edge can be moved too many times.
 //
+// ---
+//
+// Some implementation details:
+//
+// We use `DynamicForest::void MarkEdge()` to mark level-i tree edges in
+// `spanning_forests_[i]`.
+// We use `DynamicForest::void MarkVertex()` to mark vertices in
+// `spanning_forests_[i]` that are incident to level-i non-tree edges.
+//
 // TODO(tomtseng): Two practical optimizations are in Iyer et al.'s paper "An
 // Experimental Study of Polylogarithmic, Fully Dynamic, Connectivity
 // Algorithms".
@@ -31,7 +40,7 @@ namespace {
 
 // Returns floor(log_2(x)) for x > 0.
 int8_t FloorLog2(int64_t x) {
-  int32_t a = 0;
+  int8_t a{0};
   while (x > 1) {
     x >>= 1;
     a++;
@@ -92,43 +101,68 @@ int64_t DynamicConnectivity::GetSizeOfConnectedComponent(Vertex v) const {
   return spanning_forests_[0].GetSizeOfTree(v);
 }
 
+void DynamicConnectivity::AddEdgeToAdjacencyList(
+    const UndirectedEdge& edge, detail::Level level) {
+  {
+    auto& adj_list_1{non_tree_adjacency_lists_[level][edge.first]};
+    if (adj_list_1.empty()) {
+      spanning_forests_[level].MarkVertex(edge.first, true);
+    }
+    adj_list_1.emplace(edge.second);
+  }
+  {
+    auto& adj_list_2{non_tree_adjacency_lists_[level][edge.second]};
+    if (adj_list_2.empty()) {
+      spanning_forests_[level].MarkVertex(edge.second, true);
+    }
+    adj_list_2.emplace(edge.first);
+  }
+}
+
+void DynamicConnectivity::DeleteEdgeFromAdjacencyList(
+    const UndirectedEdge& edge, detail::Level level) {
+  {
+    auto& adj_list_1{non_tree_adjacency_lists_[level][edge.first]};
+    adj_list_1.erase(adj_list_1.find(edge.second));
+    if (adj_list_1.empty()) {
+      spanning_forests_[level].MarkVertex(edge.first, false);
+    }
+  }
+  {
+    auto& adj_list_2{non_tree_adjacency_lists_[level][edge.second]};
+    adj_list_2.erase(adj_list_2.find(edge.first));
+    if (adj_list_2.empty()) {
+      spanning_forests_[level].MarkVertex(edge.second, false);
+    }
+  }
+}
+
 // Add edge `edge` as a level-0 non-tree edge.
 void DynamicConnectivity::AddNonTreeEdge(const UndirectedEdge& edge) {
-  // Note: we mark vertices that have non-tree edges of a particular level
-  // incident to them.
-
   const EdgeInfo edge_info{
     .level = 0,
     .type = EdgeType::kNonTree,
   };
   edges_.emplace(edge, std::move(edge_info));
-  if (non_tree_adjacency_lists_[0][edge.first].empty()) {
-    spanning_forests_[0].MarkVertex(edge.first, true);
-  }
-  non_tree_adjacency_lists_[0][edge.first].emplace(edge.second);
-  if (non_tree_adjacency_lists_[0][edge.second].empty()) {
-    spanning_forests_[0].MarkVertex(edge.second, true);
-  }
-  non_tree_adjacency_lists_[0][edge.second].emplace(edge.first);
+  AddEdgeToAdjacencyList(edge, 0);
 }
 
 // Add edge `edge` as a level-0 tree edge.
 void DynamicConnectivity::AddTreeEdge(const UndirectedEdge& edge) {
-  // Note: we mark level-i edges in `spanning_forests_[i]`.
-
   const EdgeInfo edge_info{
     .level = 0,
     .type = EdgeType::kTree,
   };
   edges_.emplace(edge, std::move(edge_info));
   spanning_forests_[0].AddEdge(edge);
+  // We mark level-i edges in `spanning_forests_[i]`.
   spanning_forests_[0].MarkEdge(edge, true);
 }
 
 void DynamicConnectivity::AddEdge(const UndirectedEdge& edge) {
   ValidateEdge(edge, num_vertices_);
   ASSERT_MSG(edge.first != edge.second, edge << " is a self-loop edge");
-  ASSERT_MSG(HasEdge(edge), "Edge " << edge << "is already in the graph");
+  ASSERT_MSG(!HasEdge(edge), "Edge " << edge << "is already in the graph");
 
   if (IsConnected(edge.first, edge.second)) {
     AddNonTreeEdge(edge);
@@ -142,9 +176,9 @@ void DynamicConnectivity::AddEdge(const UndirectedEdge& edge) {
 // tree edge if any such edge is found.
 void
 DynamicConnectivity::ReplaceTreeEdge(const UndirectedEdge& edge, Level level) {
-  auto& spanning_forest = spanning_forests_[level];
-  Vertex u = edge.first;
-  Vertex v = edge.second;
+  auto& spanning_forest{spanning_forests_[level]};
+  Vertex u{edge.first};
+  Vertex v{edge.second};
   if (spanning_forest.GetSizeOfTree(u) > spanning_forest.GetSizeOfTree(v)) {
     std::swap(u, v);
   }
@@ -154,7 +188,7 @@ DynamicConnectivity::ReplaceTreeEdge(const UndirectedEdge& edge, Level level) {
   // invariant that `spanning_forests_[level + 1]` is a spanning forest over all
   // edges of level at least (`level` + 1) once we promote non-tree edges.
   const Level next_level = level + 1;
-  auto& next_spanning_forest = spanning_forests_[next_level];
+  auto& next_spanning_forest{spanning_forests_[next_level]};
   while (true) {
     const std::optional<const UndirectedEdge> tree_edge{
       spanning_forest.GetMarkedEdgeInTree(u)};
@@ -173,7 +207,7 @@ DynamicConnectivity::ReplaceTreeEdge(const UndirectedEdge& edge, Level level) {
   // edge
   while (true) {
     const std::optional<const Vertex> vertex_with_incident_edges{
-      spanning_forest.GetMarkedVertexInTree(v)
+      spanning_forest.GetMarkedVertexInTree(u)
     };
     if (!vertex_with_incident_edges.has_value()) {
       break;
@@ -183,28 +217,29 @@ DynamicConnectivity::ReplaceTreeEdge(const UndirectedEdge& edge, Level level) {
       non_tree_adjacency_lists_[level][*vertex_with_incident_edges]
     };
     while (!adj_list.empty()) {
-      const auto& adj_it = adj_list.begin();
-      const Vertex endpoint = *adj_it;
-      const UndirectedEdge replacement_candidate{u, endpoint};
+      const auto& adj_it{adj_list.begin()};
+      const Vertex endpoint{*adj_it};
+      const UndirectedEdge replacement_candidate{
+        *vertex_with_incident_edges, endpoint};
+
       if (spanning_forest.IsConnected(u, endpoint)) {
         // Candidate is not a replacement edge. Promote it to the next
         // level.
         edges_[replacement_candidate].level++;
-        adj_list.erase(adj_it);
-        non_tree_adjacency_lists_[level][endpoint].erase(
-            *vertex_with_incident_edges);
-        non_tree_adjacency_lists_[next_level][*vertex_with_incident_edges]
-          .emplace(endpoint);
-        non_tree_adjacency_lists_[next_level][endpoint].emplace(
-            *vertex_with_incident_edges);
+        DeleteEdgeFromAdjacencyList(replacement_candidate, level);
+        AddEdgeToAdjacencyList(replacement_candidate, next_level);
       } else {
         // Candidate must be a replacement edge connecting `u`'s tree to
         // `v`'s tree.  It cannot connect `u`'s tree to any other tree because
         // that would mean that `spanning_forest` was not actually a spanning
         // forest over edges of level at least `level` (`{u, endpoint}` could've
         // been added to the forest).
+        // Change candidate from a non-tree edge to a tree edge.
         edges_[replacement_candidate].type = EdgeType::kTree;
-        spanning_forest.AddEdge(replacement_candidate);
+        DeleteEdgeFromAdjacencyList(replacement_candidate, level);
+        for (Level l = level; l >= 0; l--) {
+          spanning_forests_[l].AddEdge(replacement_candidate);
+        }
         spanning_forest.MarkEdge(replacement_candidate, true);
         return;  // Replacement edge found.
       }
@@ -220,42 +255,22 @@ DynamicConnectivity::ReplaceTreeEdge(const UndirectedEdge& edge, Level level) {
   }
 }
 
-void DynamicConnectivity::DeleteNonTreeEdgeFromAdjacencyList(
-    const UndirectedEdge& edge, Level level) {
-  {
-    auto& adj_list_1 = non_tree_adjacency_lists_[level][edge.first];
-    adj_list_1.erase(adj_list_1.find(edge.second));
-    if (adj_list_1.empty()) {
-      spanning_forests_[level].MarkVertex(edge.first, false);
-    }
-  }
-  {
-    auto& adj_list_2 = non_tree_adjacency_lists_[level][edge.second];
-    adj_list_2.erase(adj_list_2.find(edge.first));
-    if (adj_list_2.empty()) {
-      spanning_forests_[level].MarkVertex(edge.second, false);
-    }
-  }
-}
-
 void DynamicConnectivity::DeleteEdge(const UndirectedEdge& edge) {
   ValidateEdge(edge, num_vertices_);
-  if (edge.first == edge.second) {
-    return;
-  }
-
-  const auto& edge_it = edges_.find(edge);
+  const auto& edge_it{edges_.find(edge)};
   ASSERT_MSG_ALWAYS(
       edge_it != edges_.end(),
       "Edge " << edge << " is not in the graph");
-  const EdgeInfo edge_info = edge_it->second;
+  const EdgeInfo edge_info{edge_it->second};
   edges_.erase(edge_it);
   switch (edge_info.type) {
     case EdgeType::kNonTree:
-      DeleteNonTreeEdgeFromAdjacencyList(edge, edge_info.level);
+      DeleteEdgeFromAdjacencyList(edge, edge_info.level);
       break;
     case EdgeType::kTree:
-      spanning_forests_[edge_info.level].DeleteEdge(edge);
+      for (Level l{edge_info.level}; l >= 0; l--) {
+        spanning_forests_[l].DeleteEdge(edge);
+      }
       ReplaceTreeEdge(edge, edge_info.level);
       break;
   }

@@ -117,7 +117,8 @@ class DynamicConnectivity {
  private:
   void AddNonTreeEdge(const UndirectedEdge& edge);
   void AddTreeEdge(const UndirectedEdge& edge);
-  void DeleteNonTreeEdgeFromAdjacencyList(
+  void AddEdgeToAdjacencyList(const UndirectedEdge& edge, detail::Level level);
+  void DeleteEdgeFromAdjacencyList(
       const UndirectedEdge& edge, detail::Level level);
   void ReplaceTreeEdge(const UndirectedEdge& edge, detail::Level level);
 
