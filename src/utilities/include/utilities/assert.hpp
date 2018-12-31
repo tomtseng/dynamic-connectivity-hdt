@@ -20,8 +20,8 @@ do { \
   } \
 } while (false)
 
-#ifdef DEBUG
+#ifndef NDEBUG
 #define ASSERT_MSG(cond, msg) ASSERT_MSG_ALWAYS(cond, msg)
 #else
 #define ASSERT_MSG(cond, msg) do {} while (false)
-#endif  // ifdef DEBUG
+#endif  // ifndef NDEBUG

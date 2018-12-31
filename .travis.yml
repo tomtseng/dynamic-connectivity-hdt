@@ -17,7 +17,7 @@ addons:
       # for what the version number here should be.
       - boost1.68
 install:
-  ## Install CMake 3.13.2
+  ## Install CMake 3.13.2.
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir ${DEPS_DIR}
   - cd ${DEPS_DIR}
@@ -29,9 +29,17 @@ install:
   - PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH
   - cd ${TRAVIS_BUILD_DIR}
 script:
-  - MAKE_DIR="${TRAVIS_BUILD_DIR}/build"
-  - mkdir ${MAKE_DIR}
-  - cd ${MAKE_DIR}
-  - cmake ${TRAVIS_BUILD_DIR}
+  # Build debug version.
+  - DEBUG_BUILD_DIR="${TRAVIS_BUILD_DIR}/build"
+  - mkdir ${DEBUG_BUILD_DIR}
+  - cd ${DEBUG_BUILD_DIR}
+  - cmake -DCMAKE_BUILD_TYPE=Debug ${TRAVIS_BUILD_DIR}
+  - make  # build
+  - make check  # run tests
+  # Build release version.
+  - RELEASE_BUILD_DIR="${TRAVIS_BUILD_DIR}/build"
+  - mkdir ${RELEASE_BUILD_DIR}
+  - cd ${RELEASE_BUILD_DIR}
+  - cmake -DCMAKE_BUILD_TYPE=Release ${TRAVIS_BUILD_DIR}
   - make  # build
   - make check  # run tests
