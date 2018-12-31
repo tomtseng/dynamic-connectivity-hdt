@@ -22,8 +22,8 @@ using std::pair;
 
 namespace {
 
-constexpr int32_t kEdgeMark = 0;
-constexpr int32_t kVertexMark = 1;
+constexpr int32_t kEdgeMark{0};
+constexpr int32_t kVertexMark{1};
 
 inline void ValidateEdge(const UndirectedEdge& edge, int64_t num_vertices) {
   ASSERT_MSG(
