@@ -46,6 +46,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++-7")
 set(GCC_COMPILE_FLAGS "\
   -std=c++17 \
   \
+  -DBOOST_STACKTRACE_USE_BACKTRACE \
   -DDEBUG \
   \
   -Wall \
@@ -64,7 +65,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
 
 enable_testing()
 
-# Custom target for running ctest with more helpful output
+# Custom target for running ctest with more helpful output.
 add_custom_target(check
   COMMENT "--- Running tests ---"
   COMMAND GTEST_COLOR=1 ${CMAKE_CTEST_COMMAND} --output-on-failure
