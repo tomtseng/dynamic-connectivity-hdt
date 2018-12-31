@@ -10,6 +10,7 @@
 #include <array>
 #include <optional>
 #include <utility>
+#include <vector>
 
 namespace sequence {
 
@@ -36,6 +37,8 @@ struct NodeData {
 };
 
 }  // namespace detail
+
+typedef std::pair<int64_t, int64_t> Id;
 
 // Usage: create single-element sequences with the `Element()` constructor, and
 // build bigger sequences from there.
@@ -109,11 +112,15 @@ class Element {
   // Efficiency: logarithmic in the size of the element's sequence.
   std::optional<Element*> FindMarkedElement(int32_t index) const;
 
+  // Returns the ids of the elements of the sequence in which this
+  // element lives.
+  std::vector<Id> SequenceIds() const;
+
   // Identifier for the element.
   //
   // This is specialized for storing Euler tour elements. The identifier can
   // store what edge this element represents.
-  std::pair<int64_t, int64_t> id_{-1, -1};
+  Id id_{-1, -1};
 
  private:
   void AssignChild(detail::Direction direction, Element* child);
@@ -121,6 +128,7 @@ class Element {
   Element* GetRoot() const;
   static Element* JoinRoots(Element* lesser, Element* greater);
   static Element* JoinWithRootReturned(Element* lesser, Element* greater);
+  void SequenceIds(std::vector<Id>* output) const;
   void UpdateSubtreeData();
 
   std::array<Element*, 2> children_{nullptr, nullptr};

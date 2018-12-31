@@ -263,4 +263,21 @@ std::optional<Element*> Element::FindMarkedElement(int32_t index) const {
   }
 }
 
+void Element::SequenceIds(std::vector<Id>* output) const {
+  if (children_[Direction::kLeft] != nullptr) {
+    children_[Direction::kLeft]->SequenceIds(output);
+  }
+  (*output).push_back(id_);
+  if (children_[Direction::kRight] != nullptr) {
+    children_[Direction::kRight]->SequenceIds(output);
+  }
+}
+
+std::vector<std::pair<int64_t, int64_t>> Element::SequenceIds() const {
+  const Element* root = GetRoot();
+  std::vector<Id> output;
+  root->SequenceIds(&output);
+  return output;
+}
+
 }  // namespace sequence

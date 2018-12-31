@@ -9,7 +9,7 @@ UndirectedEdge::UndirectedEdge(Vertex u, Vertex v)
   , second{std::max(u, v)} {}
 
 std::ostream& operator<<(std::ostream& out, const UndirectedEdge& edge) {
-  out << '{' << edge.first << " , " << edge.second << '}';
+  out << '{' << edge.first << ", " << edge.second << '}';
   return out;
 }
 

@@ -162,7 +162,7 @@ void DynamicConnectivity::AddTreeEdge(const UndirectedEdge& edge) {
 void DynamicConnectivity::AddEdge(const UndirectedEdge& edge) {
   ValidateEdge(edge, num_vertices_);
   ASSERT_MSG(edge.first != edge.second, edge << " is a self-loop edge");
-  ASSERT_MSG(!HasEdge(edge), "Edge " << edge << "is already in the graph");
+  ASSERT_MSG(!HasEdge(edge), "Edge " << edge << " is already in the graph");
 
   if (IsConnected(edge.first, edge.second)) {
     AddNonTreeEdge(edge);
