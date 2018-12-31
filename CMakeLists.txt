@@ -47,7 +47,6 @@ set(GCC_COMPILE_FLAGS "\
   -std=c++17 \
   \
   -DBOOST_STACKTRACE_USE_BACKTRACE \
-  -DDEBUG \
   \
   -Wall \
   -Wdouble-promotion \
