@@ -12,6 +12,9 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-7
+      # Version number may need to be incremented if the boost ppa is updated.
+      # If there are issues installing boost, check ppa:mhier/libboost-latest
+      # for what the version number here should be.
       - boost1.68
 install:
   ## Install CMake 3.13.2
