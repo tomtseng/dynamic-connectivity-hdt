@@ -13,7 +13,8 @@ do { \
   if (!(cond)) { \
     std::ostringstream str; \
     str << msg; \
-    std::cerr << str.str() << '\n' \
+    std::cerr << "ASSERTION FAILED: " << str.str() << '\n' \
+      << "Stack trace:\n" \
       << boost::stacktrace::stacktrace() << '\n'; \
     std::abort(); \
   } \
