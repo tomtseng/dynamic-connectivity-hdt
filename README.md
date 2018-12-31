@@ -43,6 +43,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug .. # or `cmake -DCMAKE_BUILD_TYPE=Release ..` to 
 make
 make check # run tests
 make docs # optional: make documentation files in docs/html/
+./src/dynamic_graph/benchmark/benchmark_dynamic_connectivity # run a benchmark
 ```
 
 ## References

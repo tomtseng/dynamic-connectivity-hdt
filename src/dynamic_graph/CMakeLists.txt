@@ -52,4 +52,5 @@ target_include_directories(lib_sequence PRIVATE
   ${CMAKE_SOURCE_DIR}/src/utilities/include
 )
 
+add_subdirectory(benchmark)
 add_subdirectory(test)
