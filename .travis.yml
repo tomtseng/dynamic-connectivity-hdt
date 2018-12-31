@@ -30,14 +30,14 @@ install:
   - cd ${TRAVIS_BUILD_DIR}
 script:
   # Build debug version.
-  - DEBUG_BUILD_DIR="${TRAVIS_BUILD_DIR}/build"
+  - DEBUG_BUILD_DIR="${TRAVIS_BUILD_DIR}/build_debug"
   - mkdir ${DEBUG_BUILD_DIR}
   - cd ${DEBUG_BUILD_DIR}
   - cmake -DCMAKE_BUILD_TYPE=Debug ${TRAVIS_BUILD_DIR}
   - make  # build
   - make check  # run tests
   # Build release version.
-  - RELEASE_BUILD_DIR="${TRAVIS_BUILD_DIR}/build"
+  - RELEASE_BUILD_DIR="${TRAVIS_BUILD_DIR}/build_release"
   - mkdir ${RELEASE_BUILD_DIR}
   - cd ${RELEASE_BUILD_DIR}
   - cmake -DCMAKE_BUILD_TYPE=Release ${TRAVIS_BUILD_DIR}
