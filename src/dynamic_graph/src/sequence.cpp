@@ -12,10 +12,9 @@
 
 namespace sequence {
 
-namespace {
+using namespace detail;
 
-  constexpr bool kLeft{0};
-  constexpr bool kRight{1};
+namespace {
 
   std::mt19937 random_generator{0};
   std::uniform_int_distribution<int64_t> priority_distribution{
@@ -40,8 +39,8 @@ Element::Element(const Element &other)
     , subtree_data_{other.subtree_data_} {
   ASSERT_MSG_ALWAYS(
       other.parent_ == nullptr
-        && other.children_[kLeft] == nullptr
-        && other.children_[kRight] == nullptr,
+        && other.children_[Direction::kLeft] == nullptr
+        && other.children_[Direction::kRight] == nullptr,
       "Copied element cannot live in a sequence of multiple elements");
 }
 
@@ -53,23 +52,23 @@ Element::Element(Element&& other) noexcept
     , node_data_{other.node_data_}
     , subtree_data_{other.subtree_data_} {
   if (parent_ != nullptr) {
-    if (parent_->children_[kLeft] == &other) {
-      parent_->children_[kLeft] = this;
+    if (parent_->children_[Direction::kLeft] == &other) {
+      parent_->children_[Direction::kLeft] = this;
     } else {
-      parent_->children_[kRight] = this;
+      parent_->children_[Direction::kRight] = this;
     }
   }
-  if (children_[kLeft] != nullptr) {
-    children_[kLeft]->parent_ = this;
+  if (children_[Direction::kLeft] != nullptr) {
+    children_[Direction::kLeft]->parent_ = this;
   }
-  if (children_[kRight] != nullptr) {
-    children_[kRight]->parent_ = this;
+  if (children_[Direction::kRight] != nullptr) {
+    children_[Direction::kRight]->parent_ = this;
   }
 }
 
-detail::SubtreeData Element::GetChildSubtreeData(bool direction) const {
+SubtreeData Element::GetChildSubtreeData(Direction direction) const {
   if (children_[direction] == nullptr) {
-    constexpr static detail::SubtreeData empty_subtree_data{
+    constexpr static SubtreeData empty_subtree_data{
       .size = 0,
       .has_marked = {false, false},
     };
@@ -82,8 +81,8 @@ detail::SubtreeData Element::GetChildSubtreeData(bool direction) const {
 // Recomputes subtree data for this node assuming that childrens' subtree data
 // is correct.
 void Element::UpdateSubtreeData() {
-  const detail::SubtreeData left_subtree_data{GetChildSubtreeData(kLeft)};
-  const detail::SubtreeData right_subtree_data{GetChildSubtreeData(kRight)};
+  const SubtreeData left_subtree_data{GetChildSubtreeData(Direction::kLeft)};
+  const SubtreeData right_subtree_data{GetChildSubtreeData(Direction::kRight)};
   subtree_data_.size = 1 + left_subtree_data.size + right_subtree_data.size;
   for (std::size_t i = 0; i < subtree_data_.has_marked.size(); i++) {
     subtree_data_.has_marked[i] =
@@ -93,7 +92,7 @@ void Element::UpdateSubtreeData() {
   }
 }
 
-void Element::AssignChild(bool direction, Element* child) {
+void Element::AssignChild(Direction direction, Element* child) {
   if (child != nullptr) {
     child->parent_ = this;
   }
@@ -114,13 +113,13 @@ Element* Element::GetRepresentative() const {
 
 Element* Element::GetPredecessor() const {
   const Element* current{this};
-  if (current->children_[kLeft] == nullptr) {
+  if (current->children_[Direction::kLeft] == nullptr) {
     // No left child. The predecessor is the first ancestor for which the start
     // element falls in the ancestor's right subtree.
     while (true) {
       if (current->parent_ == nullptr) {
         return nullptr;
-      } else if (current->parent_->children_[kRight] == current) {
+      } else if (current->parent_->children_[Direction::kRight] == current) {
         return current->parent_;
       } else {
         current = current->parent_;
@@ -129,9 +128,9 @@ Element* Element::GetPredecessor() const {
   } else {
     // The element has a left child. The predecessor is the right-most node in
     // the left child's subtree.
-    current = current->children_[kLeft];
-    while (current->children_[kRight] != nullptr) {
-      current = current->children_[kRight];
+    current = current->children_[Direction::kLeft];
+    while (current->children_[Direction::kRight] != nullptr) {
+      current = current->children_[Direction::kRight];
     }
     return const_cast<Element*>(current);
   }
@@ -147,11 +146,15 @@ Element* Element::JoinRoots(Element* lesser, Element* greater) {
   }
 
   if (lesser->priority_ > greater->priority_) {
-    lesser->AssignChild(kRight, JoinRoots(lesser->children_[kRight], greater));
+    lesser->AssignChild(
+        Direction::kRight,
+        JoinRoots(lesser->children_[Direction::kRight], greater));
     lesser->UpdateSubtreeData();
     return lesser;
   } else {
-    greater->AssignChild(kLeft, JoinRoots(lesser, greater->children_[kLeft]));
+    greater->AssignChild(
+        Direction::kLeft,
+        JoinRoots(lesser, greater->children_[Direction::kLeft]));
     greater->UpdateSubtreeData();
     return greater;
   }
@@ -181,37 +184,38 @@ Element* Element::Split() {
   Element* lesser{nullptr};
   // `greater`is the root of a sequence that will contain all elements
   // after `this`.
-  Element* greater{children_[kRight]};
-  if (children_[kRight] != nullptr) {
-    children_[kRight]->parent_ = nullptr;
-    AssignChild(kRight, nullptr);
+  Element* greater{children_[Direction::kRight]};
+  if (children_[Direction::kRight] != nullptr) {
+    children_[Direction::kRight]->parent_ = nullptr;
+    AssignChild(Direction::kRight, nullptr);
   }
 
   Element* current{this};
-  bool traversed_up_from_right{true};
-  bool current_is_right_child{true};
+  bool traversed_up_from_left{false};
+  bool current_is_left_child{false};
   while (current != nullptr) {
     Element* parent{current->parent_};
     if (parent != nullptr) {
-      current_is_right_child = parent->children_[kRight] == current;
-      parent->AssignChild(current_is_right_child, nullptr);
+      current_is_left_child = parent->children_[Direction::kLeft] == current;
+      parent->AssignChild(current_is_left_child ? kLeft : kRight, nullptr);
       current->parent_ = nullptr;
     }
-    if (traversed_up_from_right) {
-      lesser = JoinWithRootReturned(current, lesser);
-    } else {
+    if (traversed_up_from_left) {
       greater = JoinWithRootReturned(greater, current);
+    } else {
+      lesser = JoinWithRootReturned(current, lesser);
     }
 
-    traversed_up_from_right = current_is_right_child;
+    traversed_up_from_left = current_is_left_child;
     current->UpdateSubtreeData();
     current = parent;
   }
 
   // The former successor of `this` is the leftmost descendent of `greater`.
   Element* successor = greater;
-  while (successor != nullptr && successor->children_[kLeft] != nullptr) {
-    successor = successor->children_[kLeft];
+  while (successor != nullptr
+      && successor->children_[Direction::kLeft] != nullptr) {
+    successor = successor->children_[Direction::kLeft];
   }
   return successor;
 }
@@ -227,9 +231,9 @@ void Element::Mark(int32_t index, bool marked) {
     const bool old_subtree_has_marked{
       current->subtree_data_.has_marked[index]};
     const bool left_subtree_has_marked{
-      current->GetChildSubtreeData(kLeft).has_marked[index]};
+      current->GetChildSubtreeData(Direction::kLeft).has_marked[index]};
     const bool right_subtree_has_marked{
-      current->GetChildSubtreeData(kRight).has_marked[index]};
+      current->GetChildSubtreeData(Direction::kRight).has_marked[index]};
     current->subtree_data_.has_marked[index] =
       current->node_data_.marked[index]
       || left_subtree_has_marked
@@ -252,10 +256,10 @@ std::optional<Element*> Element::FindMarkedElement(int32_t index) const {
       return const_cast<Element*>(current);
     }
     current =
-      (current->children_[kLeft] != nullptr
-       && current->children_[kLeft]->subtree_data_.has_marked[index])
-      ? current->children_[kLeft]
-      : current->children_[kRight];
+      (current->children_[Direction::kLeft] != nullptr
+       && current->children_[Direction::kLeft]->subtree_data_.has_marked[index])
+      ? current->children_[Direction::kLeft]
+      : current->children_[Direction::kRight];
   }
 }
 
