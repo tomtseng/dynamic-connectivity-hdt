@@ -20,9 +20,9 @@ namespace detail {
 typedef int8_t Level;
 
 enum class EdgeType {
-  // Edges that are not in the spanning forest of the graph.
+  // Edge is in the spanning forest of the graph.
   kNonTree,
-  // Edges that are in the spanning forest of the graph.
+  // Edge is not in the spanning forest of the graph.
   kTree,
 };
 
