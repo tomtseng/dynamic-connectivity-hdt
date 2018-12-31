@@ -39,7 +39,7 @@ Run the following shell commands:
 ```bash
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Debug .. # or just `cmake ..` to remove debug assertions and info
+cmake -DCMAKE_BUILD_TYPE=Debug .. # or `cmake -DCMAKE_BUILD_TYPE=Release ..` to remove debug assertions and info
 make
 make check # run tests
 make docs # optional: make documentation files in docs/html/
