@@ -23,7 +23,7 @@ Structures (Spring 2012) — Lecture 20: Dynamic Graphs
 II](https://youtu.be/L7ywsci9ujo?t=3140). The data structure achieves O(log^2 n)
 amortized time edge insertions and deletions and O(log n) time connectivity
 queries. (This repository does not implement the extra trick of using a B-tree
-to reduce the time complexity for connectivity queries from O(log n) to O(n /
+to reduce the time complexity for connectivity queries from O(log n) to O(log n /
 log log n).)
 
 ## Building
