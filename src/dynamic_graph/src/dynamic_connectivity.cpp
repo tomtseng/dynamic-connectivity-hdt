@@ -1,5 +1,5 @@
-// This is implemented using the data structure described in section 2 of the
-// following paper:
+// This is implemented using the data structure described in the following
+// paper:
 //   Jacob Holm, Kristian de Lichtenberg, and Mikkel Thorup. "Poly-logarithmic
 //   deterministic fully-dynamic algorithms for connectivity, minimum spanning
 //   tree, 2-edge, and biconnectivity." Journal of the ACM, 48(4):723–760, 2001.
@@ -13,6 +13,9 @@
 // reconnect the spanning forest. We look at the edges in the subgraphs,
 // amortizing the cost of looking at an edge in a subgraph by moving it into
 // another subgraph and making sure that no edge can be moved too many times.
+//
+// The comments in the file won't make much sense without reading the
+// description of the data structure in the above paper.
 //
 // ---
 //
@@ -31,7 +34,7 @@
 // and quit early if we find a replacement edge.
 // 2. Once we get to high levels, the subgraphs and corresponding spanning
 // forests are small. It's not worth it to do anything sophisticated at that
-// point -- we can just brute force search.
+// point -- brute force search instead.
 #include <dynamic_graph/dynamic_connectivity.hpp>
 
 #include <utilities/assert.hpp>
@@ -204,7 +207,7 @@ DynamicConnectivity::ReplaceTreeEdge(const UndirectedEdge& edge, Level level) {
   }
 
   // Look at level-`level` non-tree edges incident to u's tree for a replacement
-  // edge
+  // edge.
   while (true) {
     const std::optional<const Vertex> vertex_with_incident_edges{
       spanning_forest.GetMarkedVertexInTree(u)

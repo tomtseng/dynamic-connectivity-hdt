@@ -14,7 +14,7 @@ want to be able to answer queries of the form "are vertices x and y connected?"
 
 The relevant header file is `dynamic_connectivity.hpp`.
 
-The data structure implemented in this repository is described in section 2 of
+The data structure implemented in this repository is described in section 3 of
 the paper [_Poly-Logarithmic Deterministic Fully-Dynamic Algorithms for
 Connectivity, Minimum Spanning Tree, 2-Edge, and
 Biconnectivity_](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.89.919&rep=rep1&type=pdf).
@@ -30,7 +30,8 @@ log log n).)
 
 ### Requirements
 
-This code uses CMake version 3.13.2 and g++ version 7.4.0 on Linux.
+This code uses CMake version 3.13.2 and g++ version 7.4.0 with Boost version
+1.68 on Linux.
 
 ### Commands
 

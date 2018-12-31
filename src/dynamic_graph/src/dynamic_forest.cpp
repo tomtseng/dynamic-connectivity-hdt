@@ -156,12 +156,6 @@ void DynamicForest::DeleteEdge(const UndirectedEdge& edge) {
   const bool is_uv_before_vu_in_tour{
     uv->GetRepresentative() != vu->GetRepresentative()};
   Element* const vu_successor{vu->Split()};
-  // We're marking `uv` and `vu` as unused. How do we know that none of
-  // `uv_predecessor`, `vu_predecessor`, `uv_successor`, and `vu_successor`
-  // point to either of them?
-  // Answer: Edge (u, v) can't immediately precede (v, u) in the tour because
-  // the element for vertex v must fall somewhere in between. Likewise for
-  // (v, u) preceding (u, v). Thus the two edge elements are not adjacent.
   Element* const uv_predecessor{uv->GetPredecessor()};
   if (uv_predecessor != nullptr) {
     uv_predecessor->Split();
@@ -175,6 +169,12 @@ void DynamicForest::DeleteEdge(const UndirectedEdge& edge) {
   } else {
     Element::Join(vu_predecessor, uv_successor);
   }
+  // We're freeing `uv` and `vu` here. How do we know that none of
+  // `uv_predecessor`, `vu_predecessor`, `uv_successor`, and `vu_successor`
+  // point to either of them?
+  // Answer: Edge (u, v) can't immediately precede (v, u) in the tour because
+  // the element for vertex v must fall somewhere in between. Likewise for
+  // (v, u) preceding (u, v). Thus the two edge elements are not adjacent.
   FreeEdgeElements(edge_elements);
 }
 
