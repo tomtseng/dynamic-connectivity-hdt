@@ -7,7 +7,7 @@ TEST(DynamicConnectivity, SingleVertexGraph) {
   EXPECT_TRUE(graph.IsConnected(0, 0));
 }
 
-TEST(DynamicConnectivity, AddAndRemoveEdges) {
+TEST(DynamicConnectivity, AddAndDeleteEdge) {
   DynamicConnectivity graph(6);
 
   // Graph is two triangles:

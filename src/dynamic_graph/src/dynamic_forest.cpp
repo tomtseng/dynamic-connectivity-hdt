@@ -156,7 +156,7 @@ void DynamicForest::DeleteEdge(const UndirectedEdge& edge) {
   const bool is_uv_before_vu_in_tour{
     uv->GetRepresentative() != vu->GetRepresentative()};
   Element* const vu_successor{vu->Split()};
-  // There's a few edge cases to think about here.
+  // There are a few edge cases to think about here.
   //
   // - Q: How do we know `uv_predecessor` and `vu_predecessor` aren't null?
   // - A: The `AddEdge` and `DeleteEdge` functions maintain that a sequence
