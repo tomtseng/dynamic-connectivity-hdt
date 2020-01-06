@@ -7,7 +7,7 @@ std::size_t CombineHashes(std::size_t hash1, std::size_t hash2) {
 }
 
 std::size_t Hash(int64_t x) {
-  // MurmurHash3 hash function.
+  // Snippet from the MurmurHash3 hash function.
   x ^= x >> 33;
   x *= 0xff51afd7ed558ccd;
   x ^= x >> 33;
