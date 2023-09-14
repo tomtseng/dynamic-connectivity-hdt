@@ -34,8 +34,7 @@ struct EdgeInfo {
 }  // namespace detail
 
 /** This class represents an undirected graph that can undergo efficient edge
- *  insertions, edge deletions, and connectivity queries. Multiple edges between
- *  a pair of vertices are supported.
+ *  insertions, edge deletions, and connectivity queries.
  */
 class DynamicConnectivity {
  public:
