@@ -91,6 +91,14 @@ class DynamicConnectivity {
    */
   int64_t GetSizeOfConnectedComponent(Vertex v) const;
 
+  /** Returns the number of connected components in the graph.
+   *
+   * Efficiency: constant.
+   *
+   * @returns The number of connected components.
+   */
+  int64_t GetNumberOfConnectedComponents() const;
+
   /** Adds an edge to the graph.
    *
    *  The edge must not already be in the graph and must not be a self-loop edge.

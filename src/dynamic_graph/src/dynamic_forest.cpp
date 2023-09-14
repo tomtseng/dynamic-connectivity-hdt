@@ -185,6 +185,9 @@ int64_t DynamicForest::GetSizeOfTree(Vertex v) const {
   return (vertices_[v].GetSize() + 2) / 3;
 }
 
+int64_t DynamicForest::GetNumberOfTrees() const {
+  return num_vertices_ - edges_.size();
+}
 
 void DynamicForest::MarkEdge(const UndirectedEdge& edge, bool mark) {
   ValidateEdge(edge, num_vertices_);

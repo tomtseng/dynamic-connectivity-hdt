@@ -104,6 +104,10 @@ int64_t DynamicConnectivity::GetSizeOfConnectedComponent(Vertex v) const {
   return spanning_forests_[0].GetSizeOfTree(v);
 }
 
+int64_t DynamicConnectivity::GetNumberOfConnectedComponents() const {
+  return spanning_forests_[0].GetNumberOfTrees();
+}
+
 void DynamicConnectivity::AddEdgeToAdjacencyList(
     const UndirectedEdge& edge, detail::Level level) {
   {

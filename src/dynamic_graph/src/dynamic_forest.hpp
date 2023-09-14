@@ -77,6 +77,11 @@ class DynamicForest {
   // Efficiency: logarithmic in the size of the forest.
   int64_t GetSizeOfTree(Vertex v) const;
 
+  // Returns the number of trees in the forest.
+  //
+  // Efficiency: constant.
+  int64_t GetNumberOfTrees() const;
+
   // Mark (if `mark` is true) or unmark (if `mark` is false) an edge. See
   // `GetMarkedEdgeInTree`.
   //
