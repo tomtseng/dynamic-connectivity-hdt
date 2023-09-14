@@ -180,7 +180,9 @@ void DynamicForest::DeleteEdge(const UndirectedEdge& edge) {
 
 int64_t DynamicForest::GetSizeOfTree(Vertex v) const {
   ValidateVertex(v, num_vertices_);
-  return vertices_[v].GetSize();
+  // A tree of n vertices will have a sequence of 3n - 2 elements: 1 element for
+  // each of n vertices and 2 elements for each of n - 1 edges.
+  return (vertices_[v].GetSize() + 2) / 3;
 }
 
 

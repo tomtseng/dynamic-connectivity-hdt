@@ -65,3 +65,30 @@ TEST(DynamicConnectivity, AddAndDeleteEdge) {
   EXPECT_FALSE(graph.IsConnected(0, 2));
   EXPECT_TRUE(graph.IsConnected(1, 2));
 }
+
+TEST(DynamicConnectivity, GetSizeOfConnectedComponent) {
+  DynamicConnectivity graph(4);
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 1);
+
+  graph.AddEdge(UndirectedEdge(0, 1));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 2);
+  graph.AddEdge(UndirectedEdge(1, 2));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 3);
+  graph.AddEdge(UndirectedEdge(0, 2));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 3);
+  graph.AddEdge(UndirectedEdge(0, 3));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 4);
+  graph.AddEdge(UndirectedEdge(1, 3));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 4);
+
+  graph.DeleteEdge(UndirectedEdge(0, 2));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 4);
+  graph.DeleteEdge(UndirectedEdge(1, 2));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 3);
+  graph.DeleteEdge(UndirectedEdge(0, 3));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 3);
+  graph.DeleteEdge(UndirectedEdge(0, 1));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 2);
+  graph.DeleteEdge(UndirectedEdge(1, 3));
+  EXPECT_EQ(graph.GetSizeOfConnectedComponent(1), 1);
+}
